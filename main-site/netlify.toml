@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/schedules/*"
+  to = "https://shiftfinder.netlify.app/:splat"
+  status = 200
+  force = true
