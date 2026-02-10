@@ -1,2 +1,1 @@
-/schedule       /schedule-app/  200!
-/schedule/*     /schedule-app/:splat  200!
+/schedule/* /schedule/index.html  200
