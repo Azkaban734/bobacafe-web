@@ -1,3 +1,8 @@
+[build]
+  base = ""
+  command = "cd schedule-app && npm ci && npm run build && mkdir -p ../main-site/schedule-app && cp -r build/* ../main-site/schedule-app/"
+  publish = "main-site"
+
 [[redirects]]
   from = "/schedules/*"
   to = "https://shiftfinder.netlify.app/:splat"
