@@ -1,7 +1,7 @@
 [build]
-  base = ""
-  command = "cd schedule-app && npm ci && npm run build && mkdir -p ../main-site/schedule-app && cp -r build/* ../main-site/schedule-app/"
-  publish = "main-site"
+  # Build schedule-app and copy into main-site so /schedule-app/ is deployed
+  command = "bash build.sh"
+  publish = "."
 
 [[redirects]]
   from = "/schedules/*"
