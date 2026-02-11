@@ -69,15 +69,16 @@ jobs:
         with:
           path: deploy
 
-      - name: Update branch with built schedule/ (for Deploy from a branch)
+      - name: Update branch with built schedule/ and root index.html (for Deploy from a branch)
         run: |
           rm -rf schedule
           mkdir -p schedule
           cp -r schedule-app/build/* schedule/
+          cp deploy/index.html index.html
           touch .nojekyll
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add schedule/ .nojekyll
+          git add schedule/ index.html .nojekyll
           git status
           if git diff --staged --quiet; then
             echo "No changes to commit"
