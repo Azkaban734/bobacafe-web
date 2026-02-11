@@ -35,11 +35,11 @@ jobs:
           npm ci
           npm run build
 
-      - name: Prepare deploy (schedule at /schedule/, minimal root)
+      - name: Prepare deploy (main-site at root, schedule at /schedule/)
         run: |
           mkdir -p deploy/schedule
+          cp main-site/index.html deploy/
           cp -r schedule-app/build/* deploy/schedule/
-          cp site-root/index.html deploy/index.html
           touch deploy/.nojekyll
           ls -la deploy
           ls -la deploy/schedule
