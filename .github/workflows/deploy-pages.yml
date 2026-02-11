@@ -1,6 +1,8 @@
-# Build schedule-app and deploy to GitHub Pages
-# - "Deploy from a branch": update-branch job commits schedule/ and .nojekyll; use that branch in Settings → Pages.
-# - "GitHub Actions": build + deploy jobs publish the artifact (root index.html + /schedule/).
+# Build schedule-app (React) and deploy to GitHub Pages
+# 1. Build the React app (npm run build) → schedule-app/build/
+# 2. Use that built output for: (a) Pages artifact, (b) schedule/ in repo for branch deploy
+# - "Deploy from a branch": build job commits built schedule/ + .nojekyll to the branch.
+# - "GitHub Actions": build job uploads artifact; deploy job publishes it.
 name: Deploy to GitHub Pages
 
 on:
@@ -18,8 +20,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Build schedule app and commit to repo so "Deploy from a branch" has /schedule/
-  update-branch:
+  # 1. Build React app (required first). 2. Prepare deploy from build output. 3. Upload artifact + update branch.
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -36,13 +38,38 @@ jobs:
           cache: "npm"
           cache-dependency-path: schedule-app/package-lock.json
 
-      - name: Build schedule-app
+      - name: Build React app (schedule-app)
         run: |
           cd schedule-app
           npm ci
           npm run build
+          echo "--- Built output ---"
+          ls -la build
+          test -f build/index.html || (echo "ERROR: React build did not produce index.html" && exit 1)
 
-      - name: Update schedule/ and .nojekyll in repo
+      - name: Prepare deploy from build output
+        run: |
+          mkdir -p deploy/schedule
+          if [ -f index.html ]; then
+            cp index.html deploy/index.html
+          elif [ -f main-site/index.html ]; then
+            cp main-site/index.html deploy/index.html
+          else
+            printf '%s\n' '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Boba Cafe | Coming Soon</title></head><body><p>Boba Cafe</p><p>Our main site is brewing. Stay tuned!</p></body></html>' > deploy/index.html
+          fi
+          cp -r schedule-app/build/* deploy/schedule/
+          touch deploy/.nojekyll
+          test -f deploy/schedule/index.html || (echo "ERROR: deploy/schedule/index.html missing" && exit 1)
+          echo "--- Deploy layout ---"
+          ls -la deploy
+          ls -la deploy/schedule
+
+      - name: Upload artifact (for GitHub Actions source)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy
+
+      - name: Update branch with built schedule/ (for Deploy from a branch)
         run: |
           rm -rf schedule
           mkdir -p schedule
@@ -58,47 +85,6 @@ jobs:
             git commit -m "Build schedule app for Pages [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: schedule-app/package-lock.json
-
-      - name: Install and build schedule-app
-        run: |
-          cd schedule-app
-          npm ci
-          npm run build
-
-      - name: Prepare deploy (root index.html + schedule app at /schedule/)
-        run: |
-          mkdir -p deploy/schedule
-          if [ -f index.html ]; then
-            cp index.html deploy/index.html
-          elif [ -f main-site/index.html ]; then
-            cp main-site/index.html deploy/index.html
-          else
-            printf '%s\n' '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Boba Cafe | Coming Soon</title></head><body><p>Boba Cafe</p><p>Our main site is brewing. Stay tuned!</p></body></html>' > deploy/index.html
-          fi
-          cp -r schedule-app/build/* deploy/schedule/
-          touch deploy/.nojekyll
-          test -f deploy/index.html || (echo "ERROR: deploy/index.html missing" && exit 1)
-          test -f deploy/schedule/index.html || (echo "ERROR: deploy/schedule/index.html missing" && exit 1)
-          ls -la deploy
-          ls -la deploy/schedule
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: deploy
 
   deploy:
     needs: build
