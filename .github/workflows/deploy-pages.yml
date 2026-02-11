@@ -1,18 +1,4 @@
-<<<<<<< Updated upstream
-# Build schedule-app and deploy to GitHub Pages
-=======
-# Build schedule-app (React) and deploy to GitHub Pages
-# 1. Build the React app (npm run build) → schedule-app/build/
-# 2. Use that built output for: (a) Pages artifact, (b) schedule/ in repo for branch deploy
-#
-# HOW TO VERIFY THE APP IS BUILT:
-# - In GitHub Actions: open the latest run → "Build React app" step: should show build/ with index.html, static/
-# - "Prepare deploy" step: should show deploy/schedule/ with index.html, static/
-# - "Update branch" step: if it says "No changes to commit", schedule/ was already on the branch; else it commits and pushes
-# - On GitHub (repo): switch to the branch you deploy from (e.g. commit/root) → at repo ROOT you must see a "schedule" folder with index.html, static/, etc. If not, the workflow push may have failed or you deploy from a different branch.
-# - If you use "Deploy from a branch": the branch in Settings → Pages must be the one the workflow pushes to (main or commit/root).
->>>>>>> Stashed changes
-name: Deploy to GitHub Pages
+name: Deploy Website and Web App
 
 on:
   push:
@@ -42,59 +28,38 @@ jobs:
           cache: "npm"
           cache-dependency-path: schedule-app/package-lock.json
 
-      - name: Install and build schedule-app
+      - name: Install and Build React App
         run: |
           cd schedule-app
           npm ci
           npm run build
 
-      - name: Prepare deploy (schedule at /schedule/, minimal root)
+      - name: Prepare Deployment Artifact
         run: |
+          # 1. Create a clean folder for deployment
           mkdir -p deploy/schedule
+
+          # 2. Copy the React build output into the /schedule subfolder
           cp -r schedule-app/build/* deploy/schedule/
+
+          # 3. Copy the main website HTML to the root (Adjust 'site-root' if your folder is named differently)
           cp site-root/index.html deploy/index.html
+
+          # 4. Create .nojekyll to prevent GitHub from ignoring files starting with _
           touch deploy/.nojekyll
-          ls -la deploy
-          ls -la deploy/schedule
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: deploy
 
-<<<<<<< Updated upstream
-=======
-      - name: Update branch with built schedule/ and root index.html (for Deploy from a branch)
-        run: |
-          rm -rf schedule
-          mkdir -p schedule
-          cp -r schedule-app/build/* schedule/
-          test -f schedule/index.html || (echo "ERROR: schedule/index.html missing after copy" && exit 1)
-          echo "--- schedule/ contents (will be committed) ---"
-          ls -la schedule
-          ls -la schedule/static 2>/dev/null || true
-          cp deploy/index.html index.html
-          touch .nojekyll
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add schedule/ index.html .nojekyll
-          git status
-          if git diff --staged --quiet; then
-            echo "No changes to commit (schedule/ and index.html already up to date on ${{ github.ref_name }})"
-          else
-            git commit -m "Build schedule app for Pages [skip ci]"
-            git push origin HEAD:${{ github.ref_name }}
-            echo "Pushed schedule/ and index.html to ${{ github.ref_name }}"
-          fi
-
->>>>>>> Stashed changes
   deploy:
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
-        id: deploy
+        id: deployment
         uses: actions/deploy-pages@v4
