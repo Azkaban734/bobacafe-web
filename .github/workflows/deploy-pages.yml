@@ -38,11 +38,16 @@ jobs:
       - name: Prepare deploy (main-site at root, schedule at /schedule/)
         run: |
           mkdir -p deploy/schedule
-          cp main-site/index.html deploy/
+          if [ -f main-site/index.html ]; then
+            cp main-site/index.html deploy/index.html
+          else
+            echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Boba Cafe</title></head><body><p>Boba Cafe</p></body></html>' > deploy/index.html
+          fi
           cp -r schedule-app/build/* deploy/schedule/
           touch deploy/.nojekyll
           ls -la deploy
           ls -la deploy/schedule
+          cat deploy/index.html | head -5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
