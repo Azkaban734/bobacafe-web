@@ -50,12 +50,14 @@ jobs:
       - name: Prepare deploy from build output
         run: |
           mkdir -p deploy/schedule
-          if [ -f index.html ]; then
+          if [ -f .github/pages-root-index.html ]; then
+            cp .github/pages-root-index.html deploy/index.html
+          elif [ -f index.html ]; then
             cp index.html deploy/index.html
           elif [ -f main-site/index.html ]; then
             cp main-site/index.html deploy/index.html
           else
-            printf '%s\n' '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Boba Cafe | Coming Soon</title></head><body><p>Boba Cafe</p><p>Our main site is brewing. Stay tuned!</p></body></html>' > deploy/index.html
+            printf '%s\n' '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Boba Cafe | Coming Soon</title></head><body><p>Boba Cafe</p><p>Our main site is brewing. Stay tuned!</p><br><a href="schedule/">Staff Schedule</a></body></html>' > deploy/index.html
           fi
           cp -r schedule-app/build/* deploy/schedule/
           touch deploy/.nojekyll
