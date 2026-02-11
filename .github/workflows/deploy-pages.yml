@@ -39,8 +39,10 @@ jobs:
         run: |
           mkdir -p deploy/schedule
           cp -r schedule-app/build/* deploy/schedule/
-          echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title></title></head><body></body></html>' > deploy/index.html
+          cp site-root/index.html deploy/index.html
           touch deploy/.nojekyll
+          ls -la deploy
+          ls -la deploy/schedule
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
