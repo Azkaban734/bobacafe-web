@@ -43,7 +43,7 @@ jobs:
           cp -r schedule-app/build/* deploy/schedule/
 
           # 3. Copy the main website HTML to the root (Adjust 'site-root' if your folder is named differently)
-          cp site-root/index.html deploy/index.html
+          cp index.html deploy/index.html
 
           # 4. Create .nojekyll to prevent GitHub from ignoring files starting with _
           touch deploy/.nojekyll
