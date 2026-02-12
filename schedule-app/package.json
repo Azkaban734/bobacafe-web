@@ -1,7 +1,7 @@
 {
   "name": "schedule-app",
   "version": "0.1.0",
-  "homepage": ".",
+  "homepage": "/schedule",
   "private": true,
   "dependencies": {
     "lucide-react": "0.554.0",
