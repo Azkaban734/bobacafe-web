@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Боба Кролик | Премиум Bubble Tea</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=8d381380-bced-4d5d-9c77-4ac6700ce366&lang=ru_RU" type="text/javascript"></script>
     <style>
         * {
             margin: 0;
@@ -239,61 +239,11 @@
 
     <div class="container">
         <section id="products">
-            <h2>Наши Фирменные Напитки</h2>
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">🧋</div>
-                    <div class="product-info">
-                        <h3>Классический Молочный Чай</h3>
-                        <p>Нежный, сливочный молочный чай с жевательными шариками тапиоки. Классический вкус, доведенный до совершенства.</p>
-                        <a href="#" class="schedule-btn">Подробнее</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">🍓</div>
-                    <div class="product-info">
-                        <h3>Фруктовый Чай</h3>
-                        <p>Освежающее сочетание свежих фруктовых вкусов с премиум-чаем. Идеально в любое время года.</p>
-                        <a href="#" class="schedule-btn">Подробнее</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">🍵</div>
-                    <div class="product-info">
-                        <h3>Премиум Матча</h3>
-                        <p>Подлинный японский матча с шелковистой текстурой и богатым умами вкусом.</p>
-                        <a href="#" class="schedule-btn">Подробнее</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">🥤</div>
-                    <div class="product-info">
-                        <h3>Авторский Напиток</h3>
-                        <p>Создайте свой собственный bubble tea! Выберите основу, добавки и уровень сладости.</p>
-                        <a href="#" class="schedule-btn">Подробнее</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">🍵</div>
-                    <div class="product-info">
-                        <h3>Деликатесный Улун</h3>
-                        <p>Отобранные вручную сорта чая улун с комплексными вкусовыми качествами и ароматом.</p>
-                        <a href="#" class="schedule-btn">Подробнее</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">💎</div>
-                    <div class="product-info">
-                        <h3>Премиум Добавки</h3>
-                        <p>Украсьте напиток кристальным желе, пудингом, лопающейся икрой и другими деликатесными добавками.</p>
-                        <a href="#" class="schedule-btn">Подробнее</a>
-                    </div>
-                </div>
+            <h2>Наше Меню</h2>
+            <div style="text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, rgba(215, 204, 200, 0.1) 0%, rgba(141, 110, 99, 0.1) 100%); border-radius: 12px; margin-top: 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+                <h3 style="color: #8d6e63; font-size: 1.5rem; margin-bottom: 1rem;">Меню в разработке</h3>
+                <p style="color: #666; font-size: 1rem; max-width: 600px; margin: 0 auto;">Полное меню Боба Кролик скоро будет доступно. Следите за обновлениями!</p>
             </div>
         </section>
 
@@ -349,48 +299,46 @@
         </p>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script>
-        // Initialize map centered on Novorossiysk/Krasnodar region
-        const map = L.map('storeMap').setView([44.65, 37.77], 10);
+    <script type="text/javascript">
+        ymaps.ready(init);
+        function init() {
+            // Store locations with real coordinates
+            const storeLocations = [
+                { name: 'Новороссийск', lat: 44.6745, lng: 37.7705, address: 'Анапское шоссе, 39А, Фуд-корт, 3 этаж' },
+                { name: 'Краснодар', lat: 45.0353, lng: 38.9755, address: 'Улица Дзержинского, 100' },
+                { name: 'Новороссийск', lat: 44.6650, lng: 37.7800, address: 'Улица Героев Десантников, 2' },
+                { name: 'Новороссийск', lat: 44.6710, lng: 37.7580, address: 'Анапское шоссе, 2' },
+                { name: 'Новороссийск', lat: 44.6520, lng: 37.7660, address: 'Улица Советов, 34' },
+                { name: 'Новороссийск', lat: 44.6590, lng: 37.7920, address: 'Набережная Адмирала Серебрякова, 27А, 1 этаж' }
+            ];
 
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
-            maxZoom: 19
-        }).addTo(map);
+            // Create map centered on Novorossiysk/Krasnodar region
+            var map = new ymaps.Map('storeMap', {
+                center: [44.65, 37.77],
+                zoom: 10
+            });
 
-        // Store locations with real coordinates
-        const storeLocations = [
-            { name: 'Новороссийск', lat: 44.6745, lng: 37.7705, address: 'Анапское шоссе, 39А, Фуд-корт, 3 этаж' },
-            { name: 'Краснодар', lat: 45.0353, lng: 38.9755, address: 'Улица Дзержинского, 100' },
-            { name: 'Новороссийск', lat: 44.6650, lng: 37.7800, address: 'Улица Героев Десантников, 2' },
-            { name: 'Новороссийск', lat: 44.6710, lng: 37.7580, address: 'Анапское шоссе, 2' },
-            { name: 'Новороссийск', lat: 44.6520, lng: 37.7660, address: 'Улица Советов, 34' },
-            { name: 'Новороссийск', lat: 44.6590, lng: 37.7920, address: 'Набережная Адмирала Серебрякова, 27А, 1 этаж' }
-        ];
+            // Add placemarks for each store
+            storeLocations.forEach(store => {
+                var placemark = new ymaps.Placemark(
+                    [store.lat, store.lng],
+                    {
+                        hintContent: store.name,
+                        balloonContent: `<strong>${store.name}</strong><br>${store.address}`
+                    },
+                    {
+                        preset: 'islands#brownCircleDotIcon'
+                    }
+                );
+                map.geoObjects.add(placemark);
+            });
 
-        // Add markers for each store
-        storeLocations.forEach(store => {
-            L.marker([store.lat, store.lng])
-                .bindPopup(`<strong>${store.name}</strong><br>${store.address}`)
-                .addTo(map);
-        });
-
-        // Add custom icon styling
-        const customIcon = L.icon({
-            iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%238d6e63"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>',
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
-        });
-
-        // Update markers with custom icon
-        storeLocations.forEach(store => {
-            L.marker([store.lat, store.lng], { icon: customIcon })
-                .bindPopup(`<strong>${store.name}</strong><br>${store.address}`)
-                .addTo(map);
-        });
+            // Add clusterer for multiple points
+            var clusterer = new ymaps.Clusterer({
+                preset: 'islands#invertedBlueTinyClusterer'
+            });
+            map.geoObjects.add(clusterer);
+        }
     </script>
 </body>
 </html>
