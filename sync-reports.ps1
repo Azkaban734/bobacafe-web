@@ -68,7 +68,10 @@ $rows
 </html>
 "@
 
-$index | Out-File -FilePath "$DestDir\index.html" -Encoding utf8
+# Write UTF-8 without BOM — Out-File -Encoding utf8 adds a BOM which garbles
+# emojis and non-ASCII characters in browsers.
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+[System.IO.File]::WriteAllText("$DestDir\index.html", $index, $utf8NoBom)
 Write-Host "Index   main-site/reports/index.html  ($($files.Count) report(s))"
 Write-Host ""
 Write-Host "Done. Commit and push bobacafe-web to publish."
