@@ -45,7 +45,12 @@ jobs:
           # 3. Copy the main website HTML to the root (Adjust 'site-root' if your folder is named differently)
           cp index.html deploy/index.html
 
-          # 4. Create .nojekyll to prevent GitHub from ignoring files starting with _
+          # 4. Copy reports folder if it exists
+          if [ -d "main-site/reports" ]; then
+            cp -r main-site/reports deploy/reports
+          fi
+
+          # 5. Create .nojekyll to prevent GitHub from ignoring files starting with _
           touch deploy/.nojekyll
 
       - name: Upload artifact
