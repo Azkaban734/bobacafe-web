@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"D:/Github/bobacafe-web/payment\")",
+      "Bash(cp \"C:/Users/david/bobacafe/payroll-script/\"* \"D:/Github/bobacafe-web/payment/\")"
+    ]
+  }
+}
