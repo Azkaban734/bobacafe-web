@@ -400,10 +400,11 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7/dist/fuse.min.js"></script>
 <script>
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGzCgnaKW7kmE-KygwX_FUZ2EX8upY7bQ1JnXzaxpUI3s39FYJJyi14hBq0GzIJc3Kkgp9tvwwjhLZ/pub?output=csv';
 
-let allItems = [], activeCategory = 'all', counts = {};
+let allItems = [], activeCategory = 'all', counts = {}, fuse = null;
 
 function parseCSV(text) {
     const rows = [];
@@ -553,11 +554,12 @@ function render(items, term) {
 function toggle(btn) { btn.closest('.faq-card').classList.toggle('open'); }
 
 function applyFilters() {
-    const term = document.getElementById('search').value.trim().toLowerCase();
-    let filtered = activeCategory === 'all' ? allItems : allItems.filter(i=>i.category===activeCategory);
-    if (term) filtered = filtered.filter(i =>
-        i.q.toLowerCase().includes(term) || i.a.toLowerCase().includes(term) ||
-        i.category.toLowerCase().includes(term) || i.sub.toLowerCase().includes(term));
+    const term = document.getElementById('search').value.trim();
+    let pool = activeCategory === 'all' ? allItems : allItems.filter(i => i.category === activeCategory);
+    const filtered = term
+        ? new Fuse(pool, { keys: [{ name:'q', weight:0.6 }, { name:'a', weight:0.3 }, { name:'sub', weight:0.1 }], threshold: 0.35, minMatchCharLength: 2 })
+            .search(term).map(r => r.item)
+        : pool;
     render(filtered, term);
 }
 
