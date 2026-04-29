@@ -4,7 +4,8 @@
       "Bash(mkdir -p \"D:/Github/bobacafe-web/payment\")",
       "Bash(cp \"C:/Users/david/bobacafe/payroll-script/\"* \"D:/Github/bobacafe-web/payment/\")",
       "Bash(cp -r schedule/* internal/schedule/)",
-      "Bash(cp main-site/reports/* internal/reports/)"
+      "Bash(cp main-site/reports/* internal/reports/)",
+      "Bash(git rm *)"
     ]
   }
 }
