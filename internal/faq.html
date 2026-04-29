@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ — Боба Кролик</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fdf6ec;
+            color: #5d4037;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #d7ccc8 0%, #8d6e63 100%);
+            color: white;
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .header-left h1 { font-size: 1.4rem; }
+        .header-left p  { font-size: 0.85rem; opacity: 0.85; margin-top: 0.15rem; }
+
+        .back-link {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 6px;
+            padding: 0.35rem 0.85rem;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .back-link:hover { background: rgba(255,255,255,0.2); }
+
+        .toolbar {
+            max-width: 860px;
+            margin: 1.75rem auto 0;
+            padding: 0 1.25rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-wrap {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-wrap svg {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a1887f;
+            pointer-events: none;
+        }
+
+        #search {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.5rem;
+            border: 1.5px solid #d7ccc8;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.95rem;
+            color: #5d4037;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #search:focus { border-color: #8d6e63; }
+
+        .cat-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .cat-btn {
+            padding: 0.45rem 1rem;
+            border-radius: 999px;
+            border: 1.5px solid #d7ccc8;
+            background: white;
+            color: #8d6e63;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .cat-btn:hover  { border-color: #8d6e63; }
+        .cat-btn.active { background: #8d6e63; border-color: #8d6e63; color: white; }
+
+        .content {
+            max-width: 860px;
+            margin: 1.5rem auto 3rem;
+            padding: 0 1.25rem;
+        }
+
+        /* results count */
+        #count {
+            font-size: 0.8rem;
+            color: #a1887f;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Category group */
+        .cat-group { margin-bottom: 2rem; }
+
+        .cat-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #5d4037;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid #d7ccc8;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cat-count {
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #d7ccc8;
+            color: #5d4037;
+            border-radius: 999px;
+            padding: 0.1rem 0.6rem;
+        }
+
+        /* Subcategory group */
+        .sub-group { margin-bottom: 1rem; }
+
+        .sub-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #8d6e63;
+            margin-bottom: 0.5rem;
+            padding-left: 0.25rem;
+        }
+
+        /* Q&A item */
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e8ddd8;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            transition: box-shadow 0.15s;
+        }
+        .faq-item:hover { box-shadow: 0 2px 8px rgba(141,110,99,0.12); }
+
+        .faq-q {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            padding: 0.9rem 1.1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5d4037;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .faq-q .chevron {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f3ede9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .faq-item.open .faq-q .chevron {
+            transform: rotate(180deg);
+            background: #8d6e63;
+            color: white;
+        }
+        .faq-item.open .faq-q .chevron svg { stroke: white; }
+
+        .faq-a {
+            display: none;
+            padding: 0 1.1rem 1rem;
+            font-size: 0.88rem;
+            color: #6d4c41;
+            line-height: 1.7;
+            border-top: 1px solid #f3ede9;
+            padding-top: 0.75rem;
+        }
+
+        .faq-item.open .faq-a { display: block; }
+
+        mark {
+            background: #fff3cd;
+            border-radius: 2px;
+            padding: 0 1px;
+        }
+
+        /* Empty state */
+        #empty {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #a1887f;
+            display: none;
+        }
+        #empty .icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+        /* Loading */
+        #loading {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #a1887f;
+        }
+        #loading .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid #d7ccc8;
+            border-top-color: #8d6e63;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #a1887f;
+            font-size: 0.78rem;
+            border-top: 1px solid #e0d6d0;
+        }
+        footer a { color: #8d6e63; text-decoration: none; }
+
+        @media (max-width: 600px) {
+            header { padding: 1rem; }
+            .toolbar { margin-top: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <h1>📋 База знаний</h1>
+        <p>Ответы на частые вопросы сотрудников</p>
+    </div>
+    <a href="/internal/" class="back-link">← Портал</a>
+</header>
+
+<div class="toolbar">
+    <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="search" type="search" placeholder="Поиск по вопросам и ответам…" autocomplete="off">
+    </div>
+    <div class="cat-filters" id="cat-filters"></div>
+</div>
+
+<div class="content">
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Загрузка данных…</p>
+    </div>
+    <div id="count"></div>
+    <div id="faq-root"></div>
+    <div id="empty">
+        <div class="icon">🔍</div>
+        <p>Ничего не найдено. Попробуйте изменить запрос.</p>
+    </div>
+</div>
+
+<footer>
+    <p>Данные обновляются автоматически из <a href="https://docs.google.com/spreadsheets" target="_blank">Google Sheets</a> &nbsp;·&nbsp; <a href="/internal/">Внутренний портал</a></p>
+</footer>
+
+<script>
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGzCgnaKW7kmE-KygwX_FUZ2EX8upY7bQ1JnXzaxpUI3s39FYJJyi14hBq0GzIJc3Kkgp9tvwwjhLZ/pub?output=csv';
+
+let allItems = [];
+let activeCategory = 'all';
+
+// ── CSV parser (handles quoted fields) ──────────────────────────────────────
+function parseCSV(text) {
+    const rows = [];
+    const lines = text.split(/\r?\n/);
+    for (const line of lines) {
+        if (!line.trim()) continue;
+        const cells = [];
+        let cur = '', inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQuote && line[i+1] === '"') { cur += '"'; i++; }
+                else inQuote = !inQuote;
+            } else if (ch === ',' && !inQuote) {
+                cells.push(cur); cur = '';
+            } else {
+                cur += ch;
+            }
+        }
+        cells.push(cur);
+        rows.push(cells);
+    }
+    return rows;
+}
+
+function stripCite(text) {
+    return text.replace(/\s*\[cite:[^\]]*\]/g, '').trim();
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(text, term) {
+    if (!term) return escapeHtml(text);
+    const escaped = escapeHtml(text);
+    const re = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+    return escaped.replace(re, '<mark>$1</mark>');
+}
+
+// ── Fetch & parse ────────────────────────────────────────────────────────────
+async function loadData() {
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if (rows.length < 2) return [];
+
+    const header = rows[0];
+    const catIdx  = header.findIndex(h => h.trim() === 'Категория');
+    const subIdx  = header.findIndex(h => h.trim() === 'Субкатегория');
+    const qIdx    = header.findIndex(h => h.trim() === 'Вопрос');
+    const aIdx    = header.findIndex(h => h.trim() === 'Ответ');
+
+    return rows.slice(1)
+        .filter(r => r[qIdx] && r[aIdx])
+        .map(r => ({
+            category: (r[catIdx] || '').trim(),
+            sub:      (r[subIdx] || '').trim(),
+            q:        stripCite((r[qIdx] || '').trim()),
+            a:        stripCite((r[aIdx] || '').trim()),
+        }));
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render(items, term) {
+    const root  = document.getElementById('faq-root');
+    const empty = document.getElementById('empty');
+    const count = document.getElementById('count');
+
+    if (items.length === 0) {
+        root.innerHTML  = '';
+        empty.style.display = 'block';
+        count.textContent   = '';
+        return;
+    }
+    empty.style.display = 'none';
+    count.textContent   = `${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}`;
+
+    // Group by category → subcategory
+    const cats = {};
+    for (const item of items) {
+        if (!cats[item.category]) cats[item.category] = {};
+        if (!cats[item.category][item.sub]) cats[item.category][item.sub] = [];
+        cats[item.category][item.sub].push(item);
+    }
+
+    root.innerHTML = Object.entries(cats).map(([cat, subs]) => {
+        const total = Object.values(subs).reduce((s, a) => s + a.length, 0);
+        const subsHtml = Object.entries(subs).map(([sub, qas]) => `
+            <div class="sub-group">
+                ${sub ? `<div class="sub-title">${escapeHtml(sub)}</div>` : ''}
+                ${qas.map(item => `
+                    <div class="faq-item">
+                        <button class="faq-q" onclick="toggle(this)">
+                            <span>${highlight(item.q, term)}</span>
+                            <span class="chevron">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </span>
+                        </button>
+                        <div class="faq-a">${highlight(item.a, term)}</div>
+                    </div>`).join('')}
+            </div>`).join('');
+
+        return `
+            <div class="cat-group">
+                <div class="cat-title">
+                    ${escapeHtml(cat)}
+                    <span class="cat-count">${total}</span>
+                </div>
+                ${subsHtml}
+            </div>`;
+    }).join('');
+}
+
+function toggle(btn) {
+    const item = btn.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    item.classList.toggle('open', !wasOpen);
+}
+
+function plural(n, one, few, many) {
+    const mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return `${n} ${one}`;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${n} ${few}`;
+    return `${n} ${many}`;
+}
+
+// ── Filter logic ─────────────────────────────────────────────────────────────
+function applyFilters() {
+    const term = document.getElementById('search').value.trim().toLowerCase();
+    let filtered = allItems;
+
+    if (activeCategory !== 'all') {
+        filtered = filtered.filter(i => i.category === activeCategory);
+    }
+
+    if (term) {
+        filtered = filtered.filter(i =>
+            i.q.toLowerCase().includes(term) ||
+            i.a.toLowerCase().includes(term) ||
+            i.category.toLowerCase().includes(term) ||
+            i.sub.toLowerCase().includes(term)
+        );
+    }
+
+    render(filtered, term);
+}
+
+// ── Category filter buttons ──────────────────────────────────────────────────
+function buildCatFilters(items) {
+    const cats = ['all', ...new Set(items.map(i => i.category).filter(Boolean))];
+    const container = document.getElementById('cat-filters');
+    container.innerHTML = cats.map(cat => {
+        const label = cat === 'all' ? 'Все' : cat;
+        const active = cat === 'all' ? 'active' : '';
+        return `<button class="cat-btn ${active}" data-cat="${cat}">${escapeHtml(label)}</button>`;
+    }).join('');
+
+    container.addEventListener('click', e => {
+        const btn = e.target.closest('.cat-btn');
+        if (!btn) return;
+        activeCategory = btn.dataset.cat;
+        container.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b === btn));
+        applyFilters();
+    });
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async () => {
+    try {
+        allItems = await loadData();
+        document.getElementById('loading').style.display = 'none';
+        buildCatFilters(allItems);
+        render(allItems, '');
+        document.getElementById('search').addEventListener('input', applyFilters);
+    } catch (err) {
+        document.getElementById('loading').innerHTML =
+            `<p style="color:#c62828">Ошибка загрузки данных: ${escapeHtml(String(err))}</p>`;
+    }
+})();
+</script>
+</body>
+</html>

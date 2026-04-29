@@ -42,8 +42,9 @@ jobs:
           # 2. Public site root
           cp index.html deploy/index.html
 
-          # 3. Internal dashboard
+          # 3. Internal dashboard + static pages
           cp internal/index.html deploy/internal/index.html
+          cp internal/faq.html   deploy/internal/faq.html
 
           # 4. Fresh React build → internal/schedule
           cp -r schedule-app/build/* deploy/internal/schedule/
