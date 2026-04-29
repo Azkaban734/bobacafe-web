@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Боба Кролик — Внутренний портал</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fdf6ec;
+            color: #5d4037;
+            min-height: 100vh;
+        }
+
+        /* ── Password overlay ── */
+        #auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(93, 64, 55, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        #auth-overlay.hidden { display: none; }
+
+        .auth-box {
+            background: #fdf6ec;
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            width: 340px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .auth-box .logo { font-size: 3rem; margin-bottom: 0.5rem; }
+
+        .auth-box h2 {
+            color: #5d4037;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-box p {
+            color: #8d6e63;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            font-size: 1.4rem;
+            text-align: center;
+            letter-spacing: 0.5rem;
+            border: 2px solid #d7ccc8;
+            border-radius: 8px;
+            background: white;
+            color: #5d4037;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .pin-input:focus { border-color: #8d6e63; }
+        .pin-input.error { border-color: #c62828; animation: shake 0.3s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .auth-btn {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.85rem;
+            background: #8d6e63;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .auth-btn:hover { background: #5d4037; }
+
+        .auth-error {
+            color: #c62828;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            min-height: 1.2em;
+        }
+
+        /* ── Main layout ── */
+        header {
+            background: linear-gradient(135deg, #d7ccc8 0%, #8d6e63 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left h1 { font-size: 1.6rem; }
+        .header-left p { font-size: 0.9rem; opacity: 0.85; margin-top: 0.2rem; }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 6px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover { background: rgba(255,255,255,0.35); }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #8d6e63;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 2rem 0 1rem;
+        }
+
+        .section-title:first-child { margin-top: 0; }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.75rem 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #8d6e63;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .app-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.13);
+        }
+
+        .app-card.disabled {
+            opacity: 0.55;
+            pointer-events: none;
+            border-left-color: #d7ccc8;
+        }
+
+        .app-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+
+        .app-card h3 {
+            font-size: 1.1rem;
+            color: #5d4037;
+            margin-bottom: 0.35rem;
+        }
+
+        .app-card p {
+            font-size: 0.85rem;
+            color: #8d6e63;
+            line-height: 1.4;
+        }
+
+        .badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-soon { background: #fff3e0; color: #e65100; }
+        .badge-live { background: #e8f5e9; color: #2e7d32; }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #a1887f;
+            font-size: 0.8rem;
+            border-top: 1px solid #e0d6d0;
+            margin-top: 2rem;
+        }
+
+        footer a { color: #8d6e63; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .app-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Password gate -->
+<div id="auth-overlay">
+    <div class="auth-box">
+        <div class="logo">🐰</div>
+        <h2>Внутренний портал</h2>
+        <p>Введите PIN для доступа</p>
+        <input type="password" class="pin-input" id="pin-input" maxlength="8" placeholder="••••" autocomplete="off">
+        <button class="auth-btn" id="auth-btn">Войти</button>
+        <div class="auth-error" id="auth-error"></div>
+    </div>
+</div>
+
+<header>
+    <div class="header-left">
+        <h1>🐰 Боба Кролик</h1>
+        <p>Внутренний портал сотрудников</p>
+    </div>
+    <button class="logout-btn" id="logout-btn">Выйти</button>
+</header>
+
+<div class="container">
+
+    <div class="section-title">Операции</div>
+    <div class="app-grid">
+        <a href="/internal/schedule/" class="app-card">
+            <span class="badge badge-live">Live</span>
+            <div class="app-icon">📅</div>
+            <h3>График работы</h3>
+            <p>Управление расписанием сотрудников</p>
+        </a>
+        <a href="#" class="app-card disabled">
+            <span class="badge badge-soon">Скоро</span>
+            <div class="app-icon">💰</div>
+            <h3>Зарплата</h3>
+            <p>Расчёт и история выплат</p>
+        </a>
+        <a href="#" class="app-card disabled">
+            <span class="badge badge-soon">Скоро</span>
+            <div class="app-icon">💳</div>
+            <h3>Платежи</h3>
+            <p>Управление платежами и переводами</p>
+        </a>
+    </div>
+
+    <div class="section-title">Финансы и отчёты</div>
+    <div class="app-grid">
+        <a href="/internal/reports/" class="app-card">
+            <span class="badge badge-live">Live</span>
+            <div class="app-icon">📊</div>
+            <h3>Отчёты</h3>
+            <p>Еженедельные и ежемесячные бизнес-отчёты</p>
+        </a>
+        <a href="#" class="app-card disabled">
+            <span class="badge badge-soon">Скоро</span>
+            <div class="app-icon">🏦</div>
+            <h3>Банковские выписки</h3>
+            <p>Обработка выписок Сбербанк и Ozon</p>
+        </a>
+    </div>
+
+</div>
+
+<footer>
+    <p><a href="/">← Главный сайт</a> &nbsp;|&nbsp; Боба Кролик &copy; 2024 — Только для сотрудников</p>
+</footer>
+
+<script>
+    const CORRECT_PIN = '2233';
+    const SESSION_KEY = 'bc_internal_auth';
+
+    const overlay   = document.getElementById('auth-overlay');
+    const pinInput  = document.getElementById('pin-input');
+    const authBtn   = document.getElementById('auth-btn');
+    const authError = document.getElementById('auth-error');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    function unlock() {
+        overlay.classList.add('hidden');
+    }
+
+    function lock() {
+        sessionStorage.removeItem(SESSION_KEY);
+        overlay.classList.remove('hidden');
+        pinInput.value = '';
+        authError.textContent = '';
+        pinInput.focus();
+    }
+
+    function attempt() {
+        if (pinInput.value === CORRECT_PIN) {
+            sessionStorage.setItem(SESSION_KEY, '1');
+            unlock();
+        } else {
+            authError.textContent = 'Неверный PIN. Попробуйте ещё раз.';
+            pinInput.classList.add('error');
+            pinInput.value = '';
+            setTimeout(() => pinInput.classList.remove('error'), 400);
+            pinInput.focus();
+        }
+    }
+
+    // Check existing session
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        unlock();
+    } else {
+        pinInput.focus();
+    }
+
+    authBtn.addEventListener('click', attempt);
+    pinInput.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
+    logoutBtn.addEventListener('click', lock);
+</script>
+</body>
+</html>
