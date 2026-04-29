@@ -5,314 +5,333 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ — Боба Кролик</title>
     <style>
+        :root {
+            --bg:           #f5f5f7;
+            --surface:      #ffffff;
+            --border:       rgba(0,0,0,0.08);
+            --text-1:       #1d1d1f;
+            --text-2:       #6e6e73;
+            --text-3:       #86868b;
+            --accent:       #8d6e63;
+            --accent-light: rgba(141,110,99,0.10);
+            --radius:       12px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #fdf6ec;
-            color: #5d4037;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text-1);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        header {
-            background: linear-gradient(135deg, #d7ccc8 0%, #8d6e63 100%);
-            color: white;
-            padding: 1.25rem 2rem;
+        /* ── Navbar ───────────────────────────────────────────────────────── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(245,245,247,0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
         }
 
-        .header-left h1 { font-size: 1.4rem; }
-        .header-left p  { font-size: 0.85rem; opacity: 0.85; margin-top: 0.15rem; }
-
-        .back-link {
-            color: rgba(255,255,255,0.85);
-            text-decoration: none;
-            font-size: 0.85rem;
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 6px;
-            padding: 0.35rem 0.85rem;
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
-        .back-link:hover { background: rgba(255,255,255,0.2); }
-
-        .toolbar {
-            max-width: 860px;
-            margin: 1.75rem auto 0;
-            padding: 0 1.25rem;
+        .nav-back {
             display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
             align-items: center;
+            gap: 0.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 0.35rem 0;
+            transition: opacity 0.15s;
         }
+        .nav-back:hover { opacity: 0.7; }
+        .nav-back svg { flex-shrink: 0; }
 
-        .search-wrap {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-
-        .search-wrap svg {
+        .nav-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-1);
             position: absolute;
-            left: 0.85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #a1887f;
+            left: 50%;
+            transform: translateX(-50%);
             pointer-events: none;
         }
 
+        /* ── Search bar ───────────────────────────────────────────────────── */
+        .search-wrap {
+            max-width: 680px;
+            margin: 1.75rem auto 0;
+            padding: 0 1.25rem;
+            position: relative;
+        }
+        .search-wrap svg {
+            position: absolute;
+            left: 2.1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-3);
+            pointer-events: none;
+        }
         #search {
             width: 100%;
-            padding: 0.65rem 1rem 0.65rem 2.5rem;
-            border: 1.5px solid #d7ccc8;
-            border-radius: 8px;
-            background: white;
+            padding: 0.7rem 1rem 0.7rem 2.75rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             font-size: 0.95rem;
-            color: #5d4037;
+            color: var(--text-1);
             outline: none;
-            transition: border-color 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s, border-color 0.2s;
+            font-family: inherit;
         }
-        #search:focus { border-color: #8d6e63; }
+        #search::placeholder { color: var(--text-3); }
+        #search:focus {
+            border-color: rgba(141,110,99,0.4);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
 
+        /* ── Category pills ───────────────────────────────────────────────── */
         .cat-filters {
+            max-width: 680px;
+            margin: 0.85rem auto 0;
+            padding: 0 1.25rem;
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
-
         .cat-btn {
-            padding: 0.45rem 1rem;
+            padding: 0.38rem 0.9rem;
             border-radius: 999px;
-            border: 1.5px solid #d7ccc8;
-            background: white;
-            color: #8d6e63;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-2);
             font-size: 0.82rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.15s;
+            font-family: inherit;
         }
-        .cat-btn:hover  { border-color: #8d6e63; }
-        .cat-btn.active { background: #8d6e63; border-color: #8d6e63; color: white; }
+        .cat-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .cat-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+        /* ── Content ──────────────────────────────────────────────────────── */
         .content {
-            max-width: 860px;
-            margin: 1.5rem auto 3rem;
+            max-width: 680px;
+            margin: 1.5rem auto 4rem;
             padding: 0 1.25rem;
         }
 
-        /* results count */
         #count {
-            font-size: 0.8rem;
-            color: #a1887f;
+            font-size: 0.78rem;
+            color: var(--text-3);
             margin-bottom: 1.25rem;
         }
 
-        /* Category group */
+        /* ── Category group ───────────────────────────────────────────────── */
         .cat-group { margin-bottom: 2rem; }
 
         .cat-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #5d4037;
-            padding: 0.5rem 0;
-            border-bottom: 2px solid #d7ccc8;
-            margin-bottom: 1rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            padding: 0 0.25rem;
+            margin-bottom: 0.6rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         .cat-count {
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: #d7ccc8;
-            color: #5d4037;
+            font-size: 0.68rem;
+            background: rgba(0,0,0,0.07);
+            color: var(--text-2);
             border-radius: 999px;
-            padding: 0.1rem 0.6rem;
+            padding: 0.05rem 0.55rem;
+            font-weight: 600;
         }
 
-        /* Subcategory group */
-        .sub-group { margin-bottom: 1rem; }
+        /* ── Sub group ────────────────────────────────────────────────────── */
+        .sub-group { margin-bottom: 0.5rem; }
 
         .sub-title {
-            font-size: 0.78rem;
-            font-weight: 700;
+            font-size: 0.7rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #8d6e63;
-            margin-bottom: 0.5rem;
-            padding-left: 0.25rem;
+            color: var(--accent);
+            margin-bottom: 0.35rem;
+            padding: 0 0.25rem;
         }
 
-        /* Q&A item */
-        .faq-item {
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #e8ddd8;
+        /* ── FAQ card ─────────────────────────────────────────────────────── */
+        .faq-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 0 0 1px var(--border);
             margin-bottom: 0.5rem;
             overflow: hidden;
-            transition: box-shadow 0.15s;
         }
-        .faq-item:hover { box-shadow: 0 2px 8px rgba(141,110,99,0.12); }
 
         .faq-q {
             width: 100%;
             text-align: left;
             background: none;
             border: none;
-            padding: 0.9rem 1.1rem;
+            padding: 0.95rem 1.1rem;
             font-size: 0.9rem;
-            font-weight: 600;
-            color: #5d4037;
+            font-weight: 500;
+            color: var(--text-1);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.75rem;
-            line-height: 1.4;
+            line-height: 1.45;
+            font-family: inherit;
+            transition: background 0.12s;
         }
+        .faq-q:hover { background: rgba(0,0,0,0.02); }
 
-        .faq-q .chevron {
+        .faq-chevron {
             flex-shrink: 0;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #f3ede9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, background 0.2s;
+            margin-top: 2px;
+            color: var(--text-3);
+            transition: transform 0.22s ease, color 0.22s;
         }
-
-        .faq-item.open .faq-q .chevron {
+        .faq-card.open .faq-chevron {
             transform: rotate(180deg);
-            background: #8d6e63;
-            color: white;
+            color: var(--accent);
         }
-        .faq-item.open .faq-q .chevron svg { stroke: white; }
 
         .faq-a {
-            display: none;
-            padding: 0 1.1rem 1rem;
-            font-size: 0.88rem;
-            color: #6d4c41;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            font-size: 0.875rem;
+            color: var(--text-2);
             line-height: 1.7;
-            border-top: 1px solid #f3ede9;
-            padding-top: 0.75rem;
+            padding: 0 1.1rem;
+            border-top: 0px solid transparent;
         }
-
-        .faq-item.open .faq-a { display: block; }
+        .faq-card.open .faq-a {
+            max-height: 600px;
+            opacity: 1;
+            padding: 0.75rem 1.1rem 1rem;
+            border-top: 1px solid var(--border);
+        }
 
         mark {
-            background: #fff3cd;
+            background: rgba(255,200,0,0.28);
             border-radius: 2px;
-            padding: 0 1px;
+            padding: 0 2px;
+            color: inherit;
         }
 
-        /* Empty state */
-        #empty {
-            text-align: center;
-            padding: 4rem 1rem;
-            color: #a1887f;
-            display: none;
-        }
-        #empty .icon { font-size: 3rem; margin-bottom: 0.75rem; }
-
-        /* Loading */
+        /* ── States ───────────────────────────────────────────────────────── */
         #loading {
             text-align: center;
             padding: 4rem 1rem;
-            color: #a1887f;
+            color: var(--text-3);
         }
-        #loading .spinner {
-            width: 32px; height: 32px;
-            border: 3px solid #d7ccc8;
-            border-top-color: #8d6e63;
+        .spinner {
+            width: 28px; height: 28px;
+            border: 2.5px solid rgba(0,0,0,0.08);
+            border-top-color: var(--accent);
             border-radius: 50%;
-            animation: spin 0.7s linear infinite;
+            animation: spin 0.65s linear infinite;
             margin: 0 auto 1rem;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        #empty {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-3);
+            display: none;
+        }
+        #empty .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        #empty p { font-size: 0.9rem; }
+
+        /* ── Footer ───────────────────────────────────────────────────────── */
         footer {
             text-align: center;
             padding: 1.5rem;
-            color: #a1887f;
-            font-size: 0.78rem;
-            border-top: 1px solid #e0d6d0;
+            font-size: 0.75rem;
+            color: var(--text-3);
+            border-top: 1px solid var(--border);
         }
-        footer a { color: #8d6e63; text-decoration: none; }
+        footer a { color: var(--accent); text-decoration: none; }
 
         @media (max-width: 600px) {
-            header { padding: 1rem; }
-            .toolbar { margin-top: 1.25rem; }
+            .nav-title { display: none; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="header-left">
-        <h1>📋 База знаний</h1>
-        <p>Ответы на частые вопросы сотрудников</p>
-    </div>
-    <a href="/internal/" class="back-link">← Портал</a>
-</header>
-
-<div class="toolbar">
-    <div class="search-wrap">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+<nav>
+    <a href="/internal/" class="nav-back">
+        <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+            <path d="M7 1L1 7l6 6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <input id="search" type="search" placeholder="Поиск по вопросам и ответам…" autocomplete="off">
-    </div>
-    <div class="cat-filters" id="cat-filters"></div>
+        &nbsp;Портал
+    </a>
+    <span class="nav-title">База знаний</span>
+</nav>
+
+<div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="search" type="search" placeholder="Поиск по вопросам и ответам…" autocomplete="off">
 </div>
+<div class="cat-filters" id="cat-filters"></div>
 
 <div class="content">
-    <div id="loading">
-        <div class="spinner"></div>
-        <p>Загрузка данных…</p>
-    </div>
+    <div id="loading"><div class="spinner"></div><p>Загрузка…</p></div>
     <div id="count"></div>
     <div id="faq-root"></div>
     <div id="empty">
         <div class="icon">🔍</div>
-        <p>Ничего не найдено. Попробуйте изменить запрос.</p>
+        <p>Ничего не найдено</p>
     </div>
 </div>
 
 <footer>
-    <p>Данные обновляются автоматически из <a href="https://docs.google.com/spreadsheets" target="_blank">Google Sheets</a> &nbsp;·&nbsp; <a href="/internal/">Внутренний портал</a></p>
+    Данные из <a href="https://docs.google.com/spreadsheets" target="_blank">Google Sheets</a> · обновляются автоматически
 </footer>
 
 <script>
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGzCgnaKW7kmE-KygwX_FUZ2EX8upY7bQ1JnXzaxpUI3s39FYJJyi14hBq0GzIJc3Kkgp9tvwwjhLZ/pub?output=csv';
 
-let allItems = [];
-let activeCategory = 'all';
+let allItems = [], activeCategory = 'all';
 
-// ── CSV parser (handles quoted fields) ──────────────────────────────────────
 function parseCSV(text) {
     const rows = [];
-    const lines = text.split(/\r?\n/);
-    for (const line of lines) {
+    for (const line of text.split(/\r?\n/)) {
         if (!line.trim()) continue;
         const cells = [];
-        let cur = '', inQuote = false;
+        let cur = '', inQ = false;
         for (let i = 0; i < line.length; i++) {
             const ch = line[i];
-            if (ch === '"') {
-                if (inQuote && line[i+1] === '"') { cur += '"'; i++; }
-                else inQuote = !inQuote;
-            } else if (ch === ',' && !inQuote) {
-                cells.push(cur); cur = '';
-            } else {
-                cur += ch;
-            }
+            if (ch === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+            else if (ch === ',' && !inQ) { cells.push(cur); cur = ''; }
+            else cur += ch;
         }
         cells.push(cur);
         rows.push(cells);
@@ -320,60 +339,52 @@ function parseCSV(text) {
     return rows;
 }
 
-function stripCite(text) {
-    return text.replace(/\s*\[cite:[^\]]*\]/g, '').trim();
+function stripCite(t) { return t.replace(/\s*\[cite:[^\]]*\]/g, '').trim(); }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hi(text, term) {
+    if (!term) return esc(text);
+    return esc(text).replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>');
 }
 
-function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function highlight(text, term) {
-    if (!term) return escapeHtml(text);
-    const escaped = escapeHtml(text);
-    const re = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
-    return escaped.replace(re, '<mark>$1</mark>');
-}
-
-// ── Fetch & parse ────────────────────────────────────────────────────────────
 async function loadData() {
-    const res = await fetch(CSV_URL);
+    const res  = await fetch(CSV_URL);
     const text = await res.text();
     const rows = parseCSV(text);
     if (rows.length < 2) return [];
-
-    const header = rows[0];
-    const catIdx  = header.findIndex(h => h.trim() === 'Категория');
-    const subIdx  = header.findIndex(h => h.trim() === 'Субкатегория');
-    const qIdx    = header.findIndex(h => h.trim() === 'Вопрос');
-    const aIdx    = header.findIndex(h => h.trim() === 'Ответ');
-
-    return rows.slice(1)
-        .filter(r => r[qIdx] && r[aIdx])
-        .map(r => ({
-            category: (r[catIdx] || '').trim(),
-            sub:      (r[subIdx] || '').trim(),
-            q:        stripCite((r[qIdx] || '').trim()),
-            a:        stripCite((r[aIdx] || '').trim()),
-        }));
+    const h = rows[0];
+    const ci = h.findIndex(x => x.trim() === 'Категория');
+    const si = h.findIndex(x => x.trim() === 'Субкатегория');
+    const qi = h.findIndex(x => x.trim() === 'Вопрос');
+    const ai = h.findIndex(x => x.trim() === 'Ответ');
+    return rows.slice(1).filter(r => r[qi] && r[ai]).map(r => ({
+        category: (r[ci]||'').trim(),
+        sub:      (r[si]||'').trim(),
+        q:        stripCite((r[qi]||'').trim()),
+        a:        stripCite((r[ai]||'').trim()),
+    }));
 }
 
-// ── Render ───────────────────────────────────────────────────────────────────
+function plural(n, one, few, many) {
+    const m10 = n%10, m100 = n%100;
+    if (m10===1 && m100!==11) return `${n} ${one}`;
+    if (m10>=2 && m10<=4 && (m100<10||m100>=20)) return `${n} ${few}`;
+    return `${n} ${many}`;
+}
+
 function render(items, term) {
-    const root  = document.getElementById('faq-root');
+    const root = document.getElementById('faq-root');
     const empty = document.getElementById('empty');
     const count = document.getElementById('count');
 
-    if (items.length === 0) {
-        root.innerHTML  = '';
+    if (!items.length) {
+        root.innerHTML = '';
         empty.style.display = 'block';
-        count.textContent   = '';
+        count.textContent = '';
         return;
     }
     empty.style.display = 'none';
-    count.textContent   = `${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}`;
+    count.textContent = plural(items.length, 'вопрос', 'вопроса', 'вопросов');
 
-    // Group by category → subcategory
     const cats = {};
     for (const item of items) {
         if (!cats[item.category]) cats[item.category] = {};
@@ -382,89 +393,57 @@ function render(items, term) {
     }
 
     root.innerHTML = Object.entries(cats).map(([cat, subs]) => {
-        const total = Object.values(subs).reduce((s, a) => s + a.length, 0);
+        const total = Object.values(subs).reduce((s,a) => s+a.length, 0);
         const subsHtml = Object.entries(subs).map(([sub, qas]) => `
             <div class="sub-group">
-                ${sub ? `<div class="sub-title">${escapeHtml(sub)}</div>` : ''}
+                ${sub ? `<div class="sub-title">${esc(sub)}</div>` : ''}
                 ${qas.map(item => `
-                    <div class="faq-item">
+                    <div class="faq-card">
                         <button class="faq-q" onclick="toggle(this)">
-                            <span>${highlight(item.q, term)}</span>
-                            <span class="chevron">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                    <polyline points="6 9 12 15 18 9"/>
-                                </svg>
-                            </span>
+                            <span>${hi(item.q, term)}</span>
+                            <svg class="faq-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
                         </button>
-                        <div class="faq-a">${highlight(item.a, term)}</div>
+                        <div class="faq-a">${hi(item.a, term)}</div>
                     </div>`).join('')}
             </div>`).join('');
-
         return `
             <div class="cat-group">
-                <div class="cat-title">
-                    ${escapeHtml(cat)}
-                    <span class="cat-count">${total}</span>
-                </div>
+                <div class="cat-title">${esc(cat)}<span class="cat-count">${total}</span></div>
                 ${subsHtml}
             </div>`;
     }).join('');
 }
 
 function toggle(btn) {
-    const item = btn.closest('.faq-item');
-    const wasOpen = item.classList.contains('open');
-    item.classList.toggle('open', !wasOpen);
+    btn.closest('.faq-card').classList.toggle('open');
 }
 
-function plural(n, one, few, many) {
-    const mod10 = n % 10, mod100 = n % 100;
-    if (mod10 === 1 && mod100 !== 11) return `${n} ${one}`;
-    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${n} ${few}`;
-    return `${n} ${many}`;
-}
-
-// ── Filter logic ─────────────────────────────────────────────────────────────
 function applyFilters() {
     const term = document.getElementById('search').value.trim().toLowerCase();
-    let filtered = allItems;
-
-    if (activeCategory !== 'all') {
-        filtered = filtered.filter(i => i.category === activeCategory);
-    }
-
-    if (term) {
-        filtered = filtered.filter(i =>
-            i.q.toLowerCase().includes(term) ||
-            i.a.toLowerCase().includes(term) ||
-            i.category.toLowerCase().includes(term) ||
-            i.sub.toLowerCase().includes(term)
-        );
-    }
-
+    let filtered = activeCategory === 'all' ? allItems : allItems.filter(i => i.category === activeCategory);
+    if (term) filtered = filtered.filter(i =>
+        i.q.toLowerCase().includes(term) || i.a.toLowerCase().includes(term) ||
+        i.category.toLowerCase().includes(term) || i.sub.toLowerCase().includes(term));
     render(filtered, term);
 }
 
-// ── Category filter buttons ──────────────────────────────────────────────────
 function buildCatFilters(items) {
     const cats = ['all', ...new Set(items.map(i => i.category).filter(Boolean))];
     const container = document.getElementById('cat-filters');
-    container.innerHTML = cats.map(cat => {
-        const label = cat === 'all' ? 'Все' : cat;
-        const active = cat === 'all' ? 'active' : '';
-        return `<button class="cat-btn ${active}" data-cat="${cat}">${escapeHtml(label)}</button>`;
-    }).join('');
-
+    container.innerHTML = cats.map(cat =>
+        `<button class="cat-btn ${cat==='all'?'active':''}" data-cat="${cat}">${esc(cat==='all'?'Все':cat)}</button>`
+    ).join('');
     container.addEventListener('click', e => {
         const btn = e.target.closest('.cat-btn');
         if (!btn) return;
         activeCategory = btn.dataset.cat;
-        container.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b === btn));
+        container.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b===btn));
         applyFilters();
     });
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────────
 (async () => {
     try {
         allItems = await loadData();
@@ -474,7 +453,7 @@ function buildCatFilters(items) {
         document.getElementById('search').addEventListener('input', applyFilters);
     } catch (err) {
         document.getElementById('loading').innerHTML =
-            `<p style="color:#c62828">Ошибка загрузки данных: ${escapeHtml(String(err))}</p>`;
+            `<p style="color:#ff3b30">Ошибка загрузки: ${esc(String(err))}</p>`;
     }
 })();
 </script>
