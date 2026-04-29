@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sberbank Monthly Summary — Boba Café</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f4f6f9; color: #1a1a2e; padding: 40px 24px;
+    }
+    header { max-width: 860px; margin: 0 auto 36px; }
+    header h1 { font-size: 1.75rem; font-weight: 700; }
+    header p { font-size: 0.9rem; color: #6b7280; margin-top: 4px; }
+    .table-wrap {
+      max-width: 860px; margin: 0 auto 48px; background: #fff;
+      border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    thead tr { background: #1a1a2e; color: #fff; }
+    thead th {
+      padding: 13px 20px; text-align: left; font-weight: 600;
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: .05em;
+    }
+    thead th:not(:first-child) { text-align: right; }
+    tbody tr:hover { background: #f0f4ff; }
+    tbody td { padding: 13px 20px; border-bottom: 1px solid #f0f0f0; }
+    tbody td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+    .row-in  { border-left: 3px solid #10b981; }
+    .row-out { border-left: 3px solid #ef4444; }
+    .val-in  { color: #065f46; font-weight: 600; }
+    .val-out { color: #991b1b; font-weight: 600; }
+    .total-col { font-weight: 700; }
+    .legend { max-width: 860px; margin: 0 auto 24px; display: flex; gap: 20px; font-size: 0.82rem; color: #6b7280; }
+    .legend span { display: flex; align-items: center; gap: 6px; }
+    .legend-bar { width: 12px; height: 12px; border-radius: 2px; }
+    tfoot tr { background: #1a1a2e; color: #fff; }
+    tfoot td { padding: 14px 20px; font-weight: 700; font-size: 0.9rem; }
+    tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 6px; padding: 3px 10px; font-size: 0.78rem; font-weight: 600;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .note { max-width: 860px; margin: -36px auto 0; font-size: 0.8rem; color: #9ca3af; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Sberbank — Monthly Summary</h1>
+  <p>Source: Sberbank statement · Currency: RUB</p>
+</header>
+<div class="legend">
+  <span><span class="legend-bar" style="background:#10b981"></span>Money in</span>
+  <span><span class="legend-bar" style="background:#ef4444"></span>Money out</span>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>January 2026</th><th>February 2026</th><th>March 2026</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row-in">
+        <td><span class="badge" style="background:#d1fae5;color:#065f46">
+          <span class="dot" style="background:#10b981"></span>POS Card Sales
+        </span></td>
+        <td class="val-in">2,209,877.80</td><td class="val-in">1,479,372.05</td><td class="val-in">1,678,138.64</td>
+        <td class="val-in total-col">5,367,388.49</td>
+      </tr>
+      <tr class="row-out">
+        <td><span class="badge" style="background:#fee2e2;color:#991b1b">
+          <span class="dot" style="background:#ef4444"></span>POS Commission
+        </span></td>
+        <td class="val-out">25,678.00</td><td class="val-out">17,175.00</td><td class="val-out">19,521.00</td>
+        <td class="val-out total-col">62,374.00</td>
+      </tr>
+      <tr class="row-in">
+        <td><span class="badge" style="background:#fef3c7;color:#92400e">
+          <span class="dot" style="background:#f59e0b"></span>Yandex.Food
+        </span></td>
+        <td class="val-in">94,328.67</td><td class="val-in">145,976.79</td><td class="val-in">137,013.48</td>
+        <td class="val-in total-col">377,318.94</td>
+      </tr>
+      <tr class="row-out">
+        <td><span class="badge" style="background:#eef2ff;color:#3730a3">
+          <span class="dot" style="background:#6366f1"></span>Salary
+        </span></td>
+        <td class="val-out">138,678.00</td><td class="val-out">290,319.00</td><td class="val-out">152,795.87</td>
+        <td class="val-out total-col">581,792.87</td>
+      </tr>
+      <tr class="row-out">
+        <td><span class="badge" style="background:#fce7f3;color:#9d174d">
+          <span class="dot" style="background:#ec4899"></span>Purchase
+        </span></td>
+        <td class="val-out">274,211.19</td><td class="val-out">183,823.24</td><td class="val-out">231,081.02</td>
+        <td class="val-out total-col">689,115.45</td>
+      </tr>
+      <tr class="row-in">
+        <td><span class="badge" style="background:#f0fdf4;color:#166534">
+          <span class="dot" style="background:#22c55e"></span>Return
+        </span></td>
+        <td class="val-in">38,384.35</td><td class="val-in">30,782.23</td><td class="val-in">16,422.81</td>
+        <td class="val-in total-col">85,589.39</td>
+      </tr>
+      <tr class="row-out">
+        <td><span class="badge" style="background:#fff7ed;color:#9a3412">
+          <span class="dot" style="background:#f97316"></span>Rent
+        </span></td>
+        <td class="val-out">602,874.31</td><td class="val-out">669,690.72</td><td class="val-out">24,617.40</td>
+        <td class="val-out total-col">1,297,182.43</td>
+      </tr>
+      <tr class="row-out">
+        <td><span class="badge" style="background:#f1f5f9;color:#334155">
+          <span class="dot" style="background:#64748b"></span>Tax
+        </span></td>
+        <td class="val-out">15,778.94</td><td class="val-out">52,854.00</td><td class="val-out">338,900.17</td>
+        <td class="val-out total-col">407,533.11</td>
+      </tr>
+      <tr class="row-out">
+        <td><span class="badge" style="background:#faf5ff;color:#6b21a8">
+          <span class="dot" style="background:#a855f7"></span>Other Payments
+        </span></td>
+        <td class="val-out">550,731.26</td><td class="val-out">349,478.09</td><td class="val-out">99,960.54</td>
+        <td class="val-out total-col">1,000,169.89</td>
+      </tr>
+      <tr class="row-out">
+        <td><span class="badge" style="background:#fefce8;color:#713f12">
+          <span class="dot" style="background:#eab308"></span>Bank Fee
+        </span></td>
+        <td class="val-out">—</td><td class="val-out">—</td><td class="val-out">200.00</td>
+        <td class="val-out total-col">200.00</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>Total Received</td>
+        <td>2,447,590.82</td><td>1,692,521.07</td><td>1,832,809.93</td>
+        <td>5,972,921.82</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+<p class="note">
+  <strong>POS Card Sales</strong>: "Зачисление средств по операциям эквайринга" — value = credit (net after fee).<br>
+  <strong>POS Commission</strong>: fee extracted from description ("Комиссия …").<br>
+  <strong>Yandex.Food</strong>: sender INN 9705114405 (ООО Яндекс.Еда) — value = credit.<br>
+  <strong>Salary</strong>: "Заработная плата по реестру" — value = debit.<br>
+  <strong>Purchase</strong>: card purchases (PURCHASE_CB) — value = debit.<br>
+  <strong>Return</strong>: purchase returns/cancellations — value = credit.<br>
+  <strong>Rent</strong>: description contains "аренд" — value = debit.<br>
+  <strong>Tax</strong>: "Единый налоговый платеж" or "ЕНП" — value = debit.<br>
+  <strong>Other Payments</strong>: description contains "Оплат" (rent takes priority if both match) — value = debit.
+</p>
+</body>
+</html>
