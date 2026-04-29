@@ -36,21 +36,22 @@ jobs:
 
       - name: Prepare Deployment Artifact
         run: |
-          # 1. Create a clean folder for deployment
-          mkdir -p deploy/schedule
+          # 1. Create output directories
+          mkdir -p deploy/internal/schedule deploy/internal/reports
 
-          # 2. Copy the React build output into the /schedule subfolder
-          cp -r schedule-app/build/* deploy/schedule/
-
-          # 3. Copy the main website HTML to the root (Adjust 'site-root' if your folder is named differently)
+          # 2. Public site root
           cp index.html deploy/index.html
 
-          # 4. Copy reports folder if it exists
-          if [ -d "main-site/reports" ]; then
-            cp -r main-site/reports deploy/reports
-          fi
+          # 3. Internal dashboard
+          cp internal/index.html deploy/internal/index.html
 
-          # 5. Create .nojekyll to prevent GitHub from ignoring files starting with _
+          # 4. Fresh React build → internal/schedule
+          cp -r schedule-app/build/* deploy/internal/schedule/
+
+          # 5. Reports
+          cp -r internal/reports/. deploy/internal/reports/
+
+          # 6. Prevent Jekyll from ignoring underscore files
           touch deploy/.nojekyll
 
       - name: Upload artifact
