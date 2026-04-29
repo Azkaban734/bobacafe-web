@@ -74,6 +74,39 @@ def fmt(v):
     return f"{v:,.2f}" if v else "—"
 
 
+def _detail_rows_html(df, type_key, months, row_id, val_class):
+    """Generate hidden detail rows for a type, grouped by receiver, sorted by total desc."""
+    type_df = df[
+        (df["type"] == type_key) &
+        df["value"].notna() &
+        df["receiver"].notna() &
+        (df["receiver"] != "") &
+        (df["receiver"].astype(str).str.strip() != "nan")
+    ].copy()
+    if type_df.empty:
+        return ""
+
+    type_df["receiver"] = type_df["receiver"].astype(str).str.strip()
+    recv_month = type_df.groupby(["receiver", "month"])["value"].sum()
+    recv_totals = type_df.groupby("receiver")["value"].sum().sort_values(ascending=False)
+
+    html = ""
+    for receiver, _ in recv_totals.items():
+        recv_vals = [recv_month.get((receiver, m), 0) for m in months]
+        recv_total = sum(recv_vals)
+        if recv_total == 0:
+            continue
+        recv_cells = "".join(f'<td class="{val_class}">{fmt(v)}</td>' for v in recv_vals)
+        label = receiver[:90] + ("…" if len(receiver) > 90 else "")
+        html += f"""
+      <tr class="detail-row" data-parent="{row_id}" style="display:none">
+        <td class="detail-label">{label}</td>
+        {recv_cells}
+        <td class="{val_class} total-col">{fmt(recv_total)}</td>
+      </tr>"""
+    return html
+
+
 def process_sber(file_buf) -> str:
     raw = pd.read_excel(file_buf, header=None)
     data = raw.iloc[11:].copy().reset_index(drop=True)
@@ -133,6 +166,9 @@ def process_sber(file_buf) -> str:
     df.loc[df["type"] == "other payments", "value"] = df.loc[df["type"] == "other payments", "debit"]
     df.loc[is_bankfee,  "value"] = df.loc[is_bankfee,  "debit"]
 
+    # Use description as the receiver label for Sberbank
+    df["receiver"] = df["description"].astype(str).str.strip()
+
     df["month"] = df["date"].dt.to_period("M")
     months = sorted(df["month"].dropna().unique())
     month_labels = {str(m): m.strftime("%B %Y") for m in months}
@@ -155,7 +191,7 @@ def process_sber(file_buf) -> str:
     totals = {str(m): df[df["month"] == m]["credit"].sum() for m in months}
 
     rows_html = ""
-    for type_key, label, bg, color, dot, flow in types_config:
+    for i, (type_key, label, bg, color, dot, flow) in enumerate(types_config):
         if type_key == "pos commission":
             vals = [commission_summary.get(m, 0) for m in months]
         else:
@@ -166,14 +202,23 @@ def process_sber(file_buf) -> str:
         row_class = "row-in" if flow == "in" else "row-out"
         val_class = "val-in" if flow == "in" else "val-out"
         cells = "".join(f'<td class="{val_class}">{fmt(v)}</td>' for v in vals)
+        row_id = f"grp-{i}"
+
         rows_html += f"""
-      <tr class="{row_class}">
-        <td><span class="badge" style="background:{bg};color:{color}">
-          <span class="dot" style="background:{dot}"></span>{label}
-        </span></td>
+      <tr class="{row_class} summary-row" data-id="{row_id}">
+        <td>
+          <span class="toggle-arrow">&#9654;</span>
+          <span class="badge" style="background:{bg};color:{color}">
+            <span class="dot" style="background:{dot}"></span>{label}
+          </span>
+        </td>
         {cells}
         <td class="{val_class} total-col">{fmt(total)}</td>
       </tr>"""
+
+        # pos commission values are derived from POS rows; skip per-receiver detail
+        if type_key != "pos commission":
+            rows_html += _detail_rows_html(df, type_key, months, row_id, val_class)
 
     month_headers = "".join(f"<th>{month_labels[str(m)]}</th>" for m in months)
     total_cells   = "".join(f"<td>{fmt(totals[str(m)])}</td>" for m in months)
@@ -236,6 +281,9 @@ def process_ozon(file_buf) -> str:
     df.loc[df["type"] == "bank fee",       "value"] = df.loc[df["type"] == "bank fee",       "debit"]
     df.loc[df["type"] == "other payments", "value"] = df.loc[df["type"] == "other payments", "debit"]
 
+    # Ozon has an explicit counterparty column
+    df["receiver"] = df["counterparty"].astype(str).str.strip()
+
     df["month"] = df["date"].dt.to_period("M")
     months = sorted(df["month"].dropna().unique())
     month_labels = {str(m): m.strftime("%B %Y") for m in months}
@@ -253,7 +301,7 @@ def process_ozon(file_buf) -> str:
     totals  = {str(m): df[df["month"] == m]["credit"].sum() for m in months}
 
     rows_html = ""
-    for type_key, label, bg, color, dot, flow in types_config:
+    for i, (type_key, label, bg, color, dot, flow) in enumerate(types_config):
         vals  = [summary.get(type_key, pd.Series(dtype=float)).get(m, 0) for m in months]
         total = sum(vals)
         if total == 0:
@@ -261,14 +309,21 @@ def process_ozon(file_buf) -> str:
         row_class = "row-in" if flow == "in" else "row-out"
         val_class = "val-in" if flow == "in" else "val-out"
         cells = "".join(f'<td class="{val_class}">{fmt(v)}</td>' for v in vals)
+        row_id = f"grp-{i}"
+
         rows_html += f"""
-      <tr class="{row_class}">
-        <td><span class="badge" style="background:{bg};color:{color}">
-          <span class="dot" style="background:{dot}"></span>{label}
-        </span></td>
+      <tr class="{row_class} summary-row" data-id="{row_id}">
+        <td>
+          <span class="toggle-arrow">&#9654;</span>
+          <span class="badge" style="background:{bg};color:{color}">
+            <span class="dot" style="background:{dot}"></span>{label}
+          </span>
+        </td>
         {cells}
         <td class="{val_class} total-col">{fmt(total)}</td>
       </tr>"""
+
+        rows_html += _detail_rows_html(df, type_key, months, row_id, val_class)
 
     month_headers = "".join(f"<th>{month_labels[str(m)]}</th>" for m in months)
     total_cells   = "".join(f"<td>{fmt(totals[str(m)])}</td>" for m in months)
@@ -313,7 +368,6 @@ def _build_html(bank_name, month_headers, rows_html, total_cells, grand_total, n
       font-size: 0.76rem; text-transform: uppercase; letter-spacing: .05em;
     }}
     thead th:not(:first-child) {{ text-align: right; }}
-    tbody tr:hover {{ background: #f0f4ff; }}
     tbody td {{ padding: 12px 18px; border-bottom: 1px solid #f0f0f0; }}
     tbody td:not(:first-child) {{ text-align: right; font-variant-numeric: tabular-nums; }}
     tfoot tr {{ background: #1a1a2e; color: #fff; }}
@@ -330,12 +384,36 @@ def _build_html(bank_name, month_headers, rows_html, total_cells, grand_total, n
     }}
     .dot {{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }}
     .note {{ max-width: 900px; margin: -28px auto 0; font-size: 0.78rem; color: #9ca3af; line-height: 1.8; }}
+
+    /* ── Expandable rows ── */
+    .summary-row {{ cursor: pointer; user-select: none; }}
+    .summary-row:hover {{ background: #f0f4ff; }}
+    .toggle-arrow {{
+      display: inline-block;
+      font-size: 0.6rem;
+      color: #9ca3af;
+      margin-right: 6px;
+      transition: transform 0.18s ease;
+      vertical-align: middle;
+    }}
+    .summary-row.expanded .toggle-arrow {{
+      transform: rotate(90deg);
+    }}
+    .detail-row {{ background: #fafbff; }}
+    .detail-row:hover {{ background: #f0f4ff; }}
+    .detail-label {{
+      padding-left: 48px !important;
+      font-size: 0.82rem;
+      color: #374151;
+      max-width: 320px;
+      word-break: break-word;
+    }}
   </style>
 </head>
 <body>
 <header>
   <h1>{bank_name} — Monthly Summary</h1>
-  <p>Source: {bank_name} statement · Currency: RUB</p>
+  <p>Source: {bank_name} statement · Currency: RUB · Click a row to expand details by receiver</p>
 </header>
 <div class="legend">
   <span><span class="legend-bar" style="background:#10b981"></span>Money in</span>
@@ -362,6 +440,18 @@ def _build_html(bank_name, month_headers, rows_html, total_cells, grand_total, n
   </table>
 </div>
 <p class="note">{note}</p>
+
+<script>
+  document.querySelectorAll('.summary-row').forEach(function(row) {{
+    row.addEventListener('click', function() {{
+      var id = this.dataset.id;
+      var expanded = this.classList.toggle('expanded');
+      document.querySelectorAll('.detail-row[data-parent="' + id + '"]').forEach(function(r) {{
+        r.style.display = expanded ? '' : 'none';
+      }});
+    }});
+  }});
+</script>
 </body>
 </html>"""
 
