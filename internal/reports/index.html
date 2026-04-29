@@ -4,158 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отчёты — Боба Кролик</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:           #f5f5f7;
-            --surface:      #ffffff;
-            --border:       rgba(0,0,0,0.08);
-            --text-1:       #1d1d1f;
-            --text-2:       #6e6e73;
-            --text-3:       #86868b;
-            --accent:       #8d6e63;
-            --accent-light: rgba(141,110,99,0.10);
+            --bg:        #f8f9fa;
+            --surface:   #ffffff;
+            --border:    #dadce0;
+            --text-1:    #202124;
+            --text-2:    #5f6368;
+            --text-3:    #80868b;
+            --accent:    #8d6e63;
+            --accent-bg: #f4ede9;
+            --shadow-md: 0 1px 3px rgba(60,64,67,.3), 0 4px 8px rgba(60,64,67,.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             background: var(--bg);
             color: var(--text-1);
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
+            font-size: 16px;
         }
 
         nav {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(245,245,247,0.85);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 0 1.5rem;
-            height: 52px;
+            height: 64px;
+            padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .nav-back {
             display: flex;
             align-items: center;
-            gap: 0.2rem;
-            font-size: 0.9rem;
+            gap: 8px;
+            font-size: 15px;
             font-weight: 500;
             color: var(--accent);
             text-decoration: none;
-            transition: opacity 0.15s;
         }
-        .nav-back:hover { opacity: 0.7; }
+        .nav-back:hover { text-decoration: underline; }
 
         .nav-title {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: var(--text-1);
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
         }
 
         .page {
-            max-width: 640px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 2.5rem 1.25rem 4rem;
+            padding: 48px 24px 80px;
         }
 
         .page-title {
-            font-size: 2rem;
+            font-size: 32px;
             font-weight: 700;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.3rem;
+            color: var(--text-1);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
         }
 
         .page-sub {
-            font-size: 0.9rem;
+            font-size: 16px;
             color: var(--text-2);
-            margin-bottom: 2rem;
+            margin-bottom: 40px;
         }
 
         .section-label {
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 0.07em;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--text-3);
-            padding: 0 0.25rem;
-            margin-bottom: 0.6rem;
+            margin-bottom: 12px;
         }
 
-        /* iOS-style table list */
         .report-list {
             background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             overflow: hidden;
+            margin-bottom: 32px;
         }
 
         .report-item {
             display: flex;
             align-items: center;
-            gap: 0.9rem;
-            padding: 0.85rem 1rem;
+            gap: 16px;
+            padding: 16px 20px;
             text-decoration: none;
             color: inherit;
             border-bottom: 1px solid var(--border);
-            transition: background 0.12s;
+            transition: background 0.1s;
         }
         .report-item:last-child { border-bottom: none; }
-        .report-item:hover { background: rgba(0,0,0,0.02); }
-        .report-item:active { background: rgba(0,0,0,0.04); }
+        .report-item:hover { background: #f8f9fa; }
 
         .report-icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            background: var(--accent-light);
+            width: 40px;
+            height: 40px;
+            background: var(--accent-bg);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 18px;
+            flex-shrink: 0;
         }
 
-        .report-info { flex: 1; min-width: 0; }
+        .report-info { flex: 1; }
 
         .report-name {
-            font-size: 0.9rem;
+            font-size: 15px;
             font-weight: 500;
             color: var(--text-1);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .report-date {
-            font-size: 0.75rem;
+            font-size: 13px;
             color: var(--text-3);
-            margin-top: 0.1rem;
+            margin-top: 2px;
         }
 
-        .report-chevron {
+        .report-arrow {
             color: var(--text-3);
-            flex-shrink: 0;
+            font-size: 18px;
+            font-weight: 300;
         }
 
         footer {
             text-align: center;
-            padding: 1.5rem;
-            font-size: 0.75rem;
+            padding: 20px;
+            font-size: 13px;
             color: var(--text-3);
             border-top: 1px solid var(--border);
         }
         footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 640px) {
+            .page { padding: 32px 16px 60px; }
+            .page-title { font-size: 26px; }
+        }
     </style>
 </head>
 <body>
@@ -163,11 +162,12 @@
 <nav>
     <a href="/internal/" class="nav-back">
         <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
-            <path d="M7 1L1 7l6 6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 1L1 7l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        &nbsp;Портал
+        Портал
     </a>
     <span class="nav-title">Отчёты</span>
+    <div style="width:72px"></div>
 </nav>
 
 <div class="page">
@@ -182,9 +182,7 @@
                 <div class="report-name">Еженедельный отчёт</div>
                 <div class="report-date">20 апреля 2026</div>
             </div>
-            <svg class="report-chevron" width="7" height="12" viewBox="0 0 7 12" fill="none">
-                <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="report-arrow">›</span>
         </a>
         <a href="2026-04-13_weekly_report.html" class="report-item">
             <div class="report-icon">📈</div>
@@ -192,9 +190,7 @@
                 <div class="report-name">Еженедельный отчёт</div>
                 <div class="report-date">13 апреля 2026</div>
             </div>
-            <svg class="report-chevron" width="7" height="12" viewBox="0 0 7 12" fill="none">
-                <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="report-arrow">›</span>
         </a>
         <a href="2026-04-06_weekly_report.html" class="report-item">
             <div class="report-icon">📈</div>
@@ -202,13 +198,11 @@
                 <div class="report-name">Еженедельный отчёт</div>
                 <div class="report-date">6 апреля 2026</div>
             </div>
-            <svg class="report-chevron" width="7" height="12" viewBox="0 0 7 12" fill="none">
-                <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="report-arrow">›</span>
         </a>
     </div>
 
-    <div class="section-label" style="margin-top:1.5rem">Ежемесячные</div>
+    <div class="section-label">Ежемесячные</div>
     <div class="report-list">
         <a href="2026-03_product_health.html" class="report-item">
             <div class="report-icon">📊</div>
@@ -216,9 +210,7 @@
                 <div class="report-name">Product Health</div>
                 <div class="report-date">Март 2026</div>
             </div>
-            <svg class="report-chevron" width="7" height="12" viewBox="0 0 7 12" fill="none">
-                <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="report-arrow">›</span>
         </a>
     </div>
 </div>
