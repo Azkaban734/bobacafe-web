@@ -1,8 +1,9 @@
-// Central PIN configuration for the internal portal.
-// Each key matches data-app on the card. Update pins here only.
-window.MASTER_PIN = '7530';  // unlocks any card
+// Central PIN configuration — edit here, then copy MASTER_PIN and APPS
+// into the <script> block at the bottom of index.html.
 
-window.APPS = {
+const MASTER_PIN = '7530';  // unlocks any card
+
+const APPS = {
     'reports': {
         url:    '/internal/reports/',
         pin:    '2244',

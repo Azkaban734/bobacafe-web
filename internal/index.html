@@ -412,9 +412,24 @@
     <a href="/">← Главный сайт</a> &nbsp;·&nbsp; Боба Кролик &copy; 2024 — Только для сотрудников
 </footer>
 
-<script src="/internal/config.js"></script>
 <script>
-    // APPS is defined in config.js
+    // ── PIN config — edit values in config.js then copy here ─────────────────
+    const MASTER_PIN = '7530';
+    const APPS = {
+        'reports': {
+            url:    '/internal/reports/',
+            pin:    '2244',
+            label:  'Отчёты',
+            icon:   '📊',
+        },
+        'bank-statement': {
+            url:    'https://bobacafe-web-bank-statement.streamlit.app/',
+            pin:    '9999',
+            label:  'Банковские выписки',
+            icon:   '🏦',
+            target: '_blank',
+        },
+    };
 
     // sessionStorage key prefix — once unlocked in a session, no re-entry needed
     const SESSION_PREFIX = 'bc_pin_';
