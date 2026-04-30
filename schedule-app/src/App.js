@@ -176,11 +176,6 @@ const App = () => {
             <h1 className="text-2xl font-bold text-center text-slate-900 mb-2">Боба Кролик</h1>
             <p className="text-center text-slate-500 text-sm mb-6">График Работы</p>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800 text-center font-medium">
-                Для доступа используйте пароль: <span className="font-bold text-blue-900">2233</span>
-              </p>
-            </div>
 
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
