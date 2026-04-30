@@ -5,7 +5,10 @@
       "Bash(cp \"C:/Users/david/bobacafe/payroll-script/\"* \"D:/Github/bobacafe-web/payment/\")",
       "Bash(cp -r schedule/* internal/schedule/)",
       "Bash(cp main-site/reports/* internal/reports/)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
