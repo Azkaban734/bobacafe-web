@@ -306,7 +306,7 @@ def process_sber(file_buf, lang) -> str:
     df.loc[is_bankfee,  "value"] = df.loc[is_bankfee,  "debit"]
 
     df["receiver"] = (
-        df["description"].astype(str)
+        df["credit_acct"].astype(str)
         .str.strip()
         .str.replace(r'^[^А-ЯЁа-яё]+', '', regex=True)
         .str.strip()
