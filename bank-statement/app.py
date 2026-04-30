@@ -305,7 +305,12 @@ def process_sber(file_buf, lang) -> str:
     df.loc[df["type"] == "other payments", "value"] = df.loc[df["type"] == "other payments", "debit"]
     df.loc[is_bankfee,  "value"] = df.loc[is_bankfee,  "debit"]
 
-    df["receiver"] = df["description"].astype(str).str.strip()
+    df["receiver"] = (
+        df["description"].astype(str)
+        .str.strip()
+        .str.replace(r'^[^А-ЯЁа-яё]+', '', regex=True)
+        .str.strip()
+    )
 
     df["month"] = df["date"].dt.to_period("M")
     months = sorted(df["month"].dropna().unique())
