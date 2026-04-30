@@ -464,7 +464,7 @@
 
     function attempt() {
         const app = APPS[activeApp];
-        if (pin === app.pin) {
+        if (pin === app.pin || pin === MASTER_PIN) {
             sessionStorage.setItem(SESSION_PREFIX + activeApp, '1');
             closeModal();
             navigate(app);
