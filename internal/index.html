@@ -31,8 +31,8 @@
             line-height: 1.5;
         }
 
-        /* ── Auth overlay ─────────────────────────────────────────────────── */
-        #auth-overlay {
+        /* ── PIN modal ────────────────────────────────────────────────────── */
+        #pin-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.54);
@@ -41,7 +41,7 @@
             justify-content: center;
             z-index: 1000;
         }
-        #auth-overlay.hidden { display: none; }
+        #pin-overlay.hidden { display: none; }
 
         .auth-card {
             background: var(--surface);
@@ -66,6 +66,7 @@
             color: var(--text-2);
             margin-bottom: 28px;
         }
+        .auth-card p strong { color: var(--text-1); }
 
         .pin-dots {
             display: flex;
@@ -81,7 +82,6 @@
             transition: background 0.12s, border-color 0.12s;
         }
         .pin-dots span.filled { background: var(--accent); border-color: var(--accent); }
-        .pin-dots.error span.filled,
         .pin-dots.error span { background: #d93025; border-color: #d93025; }
 
         @keyframes shake {
@@ -90,8 +90,6 @@
             60%      { transform: translateX(8px); }
         }
         .pin-dots.shake { animation: shake 0.3s ease; }
-
-        #pin-input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
 
         .auth-keypad {
             display: grid;
@@ -116,6 +114,7 @@
         .key:active { background: #e8eaed; }
         .key.del { font-size: 16px; color: var(--text-2); }
         .key.empty { background: transparent; border-color: transparent; pointer-events: none; }
+        .key.cancel { font-size: 13px; color: var(--text-2); }
 
         .auth-error {
             font-size: 13px;
@@ -157,20 +156,6 @@
             border-radius: 4px;
             padding: 3px 8px;
         }
-
-        .logout-btn {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--accent);
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 7px 16px;
-            cursor: pointer;
-            font-family: 'Roboto', Arial, sans-serif;
-            transition: background 0.15s;
-        }
-        .logout-btn:hover { background: var(--accent-bg); border-color: var(--accent); }
 
         /* ── Page ─────────────────────────────────────────────────────────── */
         .page {
@@ -254,6 +239,13 @@
         }
         .badge-live { background: #e6f4ea; color: #137333; }
         .badge-soon { background: #fef7e0; color: #b06000; }
+        .badge-locked {
+            background: #f1f3f4;
+            color: var(--text-3);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
         .app-name {
             font-size: 17px;
@@ -301,16 +293,15 @@
 </head>
 <body>
 
-<!-- Auth -->
-<div id="auth-overlay">
+<!-- PIN modal (hidden until a locked card is clicked) -->
+<div id="pin-overlay" class="hidden">
     <div class="auth-card">
-        <div class="auth-logo">🐰</div>
-        <h2>Боба Кролик</h2>
-        <p>Внутренний портал · введите PIN</p>
+        <div class="auth-logo" id="modal-icon">🔒</div>
+        <h2 id="modal-title">Доступ закрыт</h2>
+        <p>Введите PIN для <strong id="modal-app-name"></strong></p>
         <div class="pin-dots" id="pin-dots">
             <span></span><span></span><span></span><span></span>
         </div>
-        <input type="password" id="pin-input" inputmode="numeric" maxlength="4" autocomplete="off">
         <div class="auth-keypad" id="keypad">
             <button class="key" data-d="1">1</button>
             <button class="key" data-d="2">2</button>
@@ -321,7 +312,7 @@
             <button class="key" data-d="7">7</button>
             <button class="key" data-d="8">8</button>
             <button class="key" data-d="9">9</button>
-            <button class="key empty"></button>
+            <button class="key cancel" id="key-cancel">Отмена</button>
             <button class="key" data-d="0">0</button>
             <button class="key del" id="key-del">⌫</button>
         </div>
@@ -334,7 +325,6 @@
     <div class="nav-brand">🐰 Боба Кролик</div>
     <div class="nav-right">
         <span class="nav-tag">Внутренний</span>
-        <button class="logout-btn" id="logout-btn">Выйти</button>
     </div>
 </nav>
 
@@ -347,6 +337,7 @@
     <div class="section">
         <div class="section-label">База знаний</div>
         <div class="app-grid">
+            <!-- No PIN — opens freely -->
             <a href="/internal/faq.html" class="app-card">
                 <div class="card-top">
                     <div class="app-icon">📋</div>
@@ -362,15 +353,16 @@
     <div class="section">
         <div class="section-label">Операции</div>
         <div class="app-grid">
-            <a href="/internal/schedule/" class="app-card">
+            <!-- PIN protected -->
+            <div class="app-card" data-app="schedule">
                 <div class="card-top">
                     <div class="app-icon">📅</div>
-                    <span class="badge badge-live">Live</span>
+                    <span class="badge badge-locked">🔒 PIN</span>
                 </div>
                 <div class="app-name">График работы</div>
                 <div class="app-desc">Управление расписанием сотрудников</div>
                 <div class="card-link">Открыть →</div>
-            </a>
+            </div>
             <a href="#" class="app-card disabled">
                 <div class="card-top">
                     <div class="app-icon">💰</div>
@@ -393,24 +385,26 @@
     <div class="section">
         <div class="section-label">Финансы и отчёты</div>
         <div class="app-grid">
-            <a href="/internal/reports/" class="app-card">
+            <!-- PIN protected -->
+            <div class="app-card" data-app="reports">
                 <div class="card-top">
                     <div class="app-icon">📊</div>
-                    <span class="badge badge-live">Live</span>
+                    <span class="badge badge-locked">🔒 PIN</span>
                 </div>
                 <div class="app-name">Отчёты</div>
                 <div class="app-desc">Еженедельные и ежемесячные бизнес-отчёты</div>
                 <div class="card-link">Открыть →</div>
-            </a>
-            <a href="https://bobacafe-web-bank-statement.streamlit.app/" class="app-card" target="_blank">
+            </div>
+            <!-- PIN protected (accountant's card) -->
+            <div class="app-card" data-app="bank-statement">
                 <div class="card-top">
                     <div class="app-icon">🏦</div>
-                    <span class="badge badge-live">Live</span>
+                    <span class="badge badge-locked">🔒 PIN</span>
                 </div>
                 <div class="app-name">Банковские выписки</div>
                 <div class="app-desc">Обработка выписок Сбербанк и Ozon</div>
                 <div class="card-link">Открыть ↗</div>
-            </a>
+            </div>
         </div>
     </div>
 </div>
@@ -419,35 +413,62 @@
     <a href="/">← Главный сайт</a> &nbsp;·&nbsp; Боба Кролик &copy; 2024 — Только для сотрудников
 </footer>
 
+<script src="/internal/config.js"></script>
 <script>
-    const CORRECT_PIN = '2233';
-    const SESSION_KEY = 'bc_internal_auth';
+    // APPS is defined in config.js
 
-    const overlay   = document.getElementById('auth-overlay');
+    // sessionStorage key prefix — once unlocked in a session, no re-entry needed
+    const SESSION_PREFIX = 'bc_pin_';
+
+    // ── Modal state ───────────────────────────────────────────────────────────
+    const overlay   = document.getElementById('pin-overlay');
     const dotsEl    = document.getElementById('pin-dots');
     const dots      = dotsEl.querySelectorAll('span');
     const errEl     = document.getElementById('auth-error');
     const keypad    = document.getElementById('keypad');
-    const logoutBtn = document.getElementById('logout-btn');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalTitle = document.getElementById('modal-title');
+    const modalName = document.getElementById('modal-app-name');
+
     let pin = '';
+    let activeApp = null;
 
     function updateDots() {
         dots.forEach((d, i) => d.classList.toggle('filled', i < pin.length));
     }
 
-    function unlock() { overlay.classList.add('hidden'); }
-
-    function lock() {
-        sessionStorage.removeItem(SESSION_KEY);
-        pin = ''; updateDots(); errEl.textContent = '';
-        dotsEl.classList.remove('error');
+    function openModal(appKey) {
+        const app = APPS[appKey];
+        activeApp = appKey;
+        pin = '';
+        errEl.textContent = '';
+        dotsEl.classList.remove('error', 'shake');
+        updateDots();
+        modalIcon.textContent = app.icon;
+        modalName.textContent = app.label;
         overlay.classList.remove('hidden');
     }
 
+    function closeModal() {
+        overlay.classList.add('hidden');
+        activeApp = null;
+        pin = '';
+    }
+
+    function navigate(app) {
+        if (app.target === '_blank') {
+            window.open(app.url, '_blank', 'noopener');
+        } else {
+            window.location.href = app.url;
+        }
+    }
+
     function attempt() {
-        if (pin === CORRECT_PIN) {
-            sessionStorage.setItem(SESSION_KEY, '1');
-            unlock();
+        const app = APPS[activeApp];
+        if (pin === app.pin) {
+            sessionStorage.setItem(SESSION_PREFIX + activeApp, '1');
+            closeModal();
+            navigate(app);
         } else {
             dotsEl.classList.add('error', 'shake');
             errEl.textContent = 'Неверный PIN. Попробуйте ещё раз.';
@@ -459,24 +480,42 @@
         }
     }
 
+    // ── Card clicks ───────────────────────────────────────────────────────────
+    document.querySelectorAll('.app-card[data-app]').forEach(card => {
+        card.addEventListener('click', () => {
+            const key = card.dataset.app;
+            if (sessionStorage.getItem(SESSION_PREFIX + key) === '1') {
+                navigate(APPS[key]);   // already unlocked this session
+            } else {
+                openModal(key);
+            }
+        });
+    });
+
+    // ── Keypad ────────────────────────────────────────────────────────────────
     keypad.addEventListener('click', e => {
         const key = e.target.closest('.key');
         if (!key || key.classList.contains('empty')) return;
+        if (key.id === 'key-cancel') { closeModal(); return; }
         if (key.id === 'key-del') { pin = pin.slice(0, -1); }
-        else if (pin.length < 4) { pin += key.dataset.d; if (pin.length === 4) setTimeout(attempt, 80); }
+        else if (pin.length < 4) {
+            pin += key.dataset.d;
+            if (pin.length === 4) setTimeout(attempt, 80);
+        }
         updateDots();
     });
 
     document.addEventListener('keydown', e => {
         if (overlay.classList.contains('hidden')) return;
+        if (e.key === 'Escape') { closeModal(); return; }
         if (e.key >= '0' && e.key <= '9' && pin.length < 4) {
             pin += e.key; updateDots();
             if (pin.length === 4) setTimeout(attempt, 80);
         } else if (e.key === 'Backspace') { pin = pin.slice(0, -1); updateDots(); }
     });
 
-    logoutBtn.addEventListener('click', lock);
-    if (sessionStorage.getItem(SESSION_KEY) === '1') unlock();
+    // close on backdrop click
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 </script>
 </body>
 </html>
