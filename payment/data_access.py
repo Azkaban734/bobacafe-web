@@ -8,7 +8,12 @@ _SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 
 def _client():
-    creds = Credentials.from_service_account_file(_CREDS_PATH, scopes=_SCOPES)
+    if os.path.exists(_CREDS_PATH):
+        creds = Credentials.from_service_account_file(_CREDS_PATH, scopes=_SCOPES)
+    else:
+        import streamlit as st
+        info = dict(st.secrets['gcp_service_account'])
+        creds = Credentials.from_service_account_info(info, scopes=_SCOPES)
     return gspread.authorize(creds)
 
 
