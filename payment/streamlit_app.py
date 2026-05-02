@@ -167,18 +167,16 @@ with st.expander(h2_label):
 
 # Panel 5 — Verification
 v        = c['verification']
-has_diff = v['totals']['diff'] != 0
-v_label  = f"5 · Store Verification — Schedule: {v['totals']['scheduleCost']:,.0f}  ·  Employees: {v['totals']['employeeCost']:,.0f}"
+t        = v['totals']
+has_diff = t['diff'] != 0
+v_label  = f"5 · Verification — Schedule: {t['scheduleCost']:,.0f}  ·  Employees: {t['employeeCost']:,.0f}"
+if has_diff:
+    v_label += f"  ·  Diff: {t['diff']:,.0f}"
 with st.expander(v_label, expanded=has_diff):
-    st.caption('By schedule — shift rates × shifts per store.  By employee — total pay grouped by home store.  '
-               'Differences arise from cross-store work and bonuses/penalties.')
-    v_rows = v['rows'] + [{'store': 'TOTAL', **v['totals']}]
-    st.dataframe([{
-        'Store': r['store'],
-        'By Schedule': r['scheduleCost'],
-        'By Employee': r['employeeCost'],
-        'Diff': r['diff'],
-    } for r in v_rows], use_container_width=True)
+    col1, col2, col3 = st.columns(3)
+    col1.metric('By Schedule', f"{t['scheduleCost']:,.0f}")
+    col2.metric('By Employee', f"{t['employeeCost']:,.0f}")
+    col3.metric('Adjustment', f"{t['diff']:,.0f}", delta_color='inverse' if t['diff'] != 0 else 'off')
 
 # ── Downloads ─────────────────────────────────────────────────────────────────
 
