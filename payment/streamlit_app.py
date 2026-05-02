@@ -16,7 +16,7 @@ st.set_page_config(page_title='Boba Rabbit — Payroll', layout='wide')
 
 # ── Auth gate ─────────────────────────────────────────────────────────────────
 
-if not st.user.is_logged_in:
+if not getattr(st.user, 'is_logged_in', False):
     st.title('Boba Rabbit — Payroll Calculator')
     st.button('Sign in with Google', on_click=st.login, args=('google',))
     st.stop()
