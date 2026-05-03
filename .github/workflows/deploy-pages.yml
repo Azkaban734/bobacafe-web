@@ -34,17 +34,26 @@ jobs:
           npm ci
           npm run build
 
-      - name: Mint Databricks OAuth Token
+      - name: Mint Databricks Embedded Dashboard Token
         id: databricks_token
         env:
           CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
         run: |
-          RESPONSE=$(curl -sf -X POST \
+          # Step 1: get service principal OAuth token
+          OAUTH=$(curl -sf -X POST \
             https://dbc-d5bd17fc-eaf4.cloud.databricks.com/oidc/v1/token \
             -u "${CLIENT_ID}:${CLIENT_SECRET}" \
             -d "grant_type=client_credentials&scope=all-apis")
-          TOKEN=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+          OAUTH_TOKEN=$(echo "$OAUTH" | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+          # Step 2: exchange for a dashboard-scoped embedded token
+          EMBED=$(curl -sf -X POST \
+            "https://dbc-d5bd17fc-eaf4.cloud.databricks.com/api/2.0/lakeview/dashboards/01f14724493017eb83de2e8f2f33b5dc/published/credentials" \
+            -H "Authorization: Bearer ${OAUTH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+          TOKEN=$(echo "$EMBED" | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
           echo "::add-mask::$TOKEN"
           echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
 
