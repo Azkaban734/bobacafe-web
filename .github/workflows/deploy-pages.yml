@@ -54,24 +54,38 @@ jobs:
             "${WORKSPACE}/api/2.0/lakeview/dashboards/${DASHBOARD_ID}/published/tokeninfo?external_viewer_id=internal&external_value=internal" \
             -H "Authorization: Bearer ${OAUTH_TOKEN}")
 
+          # Log tokeninfo keys for debugging (no secrets exposed)
+          echo "$TOKEN_INFO" | python3 -c "import sys,json; d=json.load(sys.stdin); print('tokeninfo keys:', list(d.keys()))"
+
           # Step 3: exchange authorization_details for embedded token
           cat > /tmp/mint_token.py << 'PYEOF'
-          import os, json, base64, urllib.parse, urllib.request
-          info       = json.loads(os.environ["TOKEN_INFO"])
-          params     = dict(info)
-          auth       = params.pop("authorization_details", None)
-          params["grant_type"]           = "client_credentials"
+          import os, json, base64, urllib.parse, urllib.request, sys
+          info   = json.loads(os.environ["TOKEN_INFO"])
+          print("tokeninfo keys:", list(info.keys()), file=sys.stderr)
+
+          params = dict(info)
+          auth   = params.pop("authorization_details", None)
+          # use token_endpoint from tokeninfo if provided, else fall back
+          endpoint = params.pop("token_endpoint", f"{os.environ['WORKSPACE']}/oidc/v1/token")
+          params["grant_type"]            = "client_credentials"
           params["authorization_details"] = json.dumps(auth)
+
           basic = base64.b64encode(
               f"{os.environ['CLIENT_ID']}:{os.environ['CLIENT_SECRET']}".encode()
           ).decode()
-          req = urllib.request.Request(
-              f"{os.environ['WORKSPACE']}/oidc/v1/token",
-              data=urllib.parse.urlencode(params).encode(),
+          body = urllib.parse.urlencode(params).encode()
+          req  = urllib.request.Request(
+              endpoint,
+              data=body,
               headers={"Content-Type": "application/x-www-form-urlencoded",
                        "Authorization": f"Basic {basic}"}
           )
-          print(json.loads(urllib.request.urlopen(req).read())["access_token"])
+          try:
+              resp = urllib.request.urlopen(req)
+              print(json.loads(resp.read())["access_token"])
+          except urllib.error.HTTPError as e:
+              print("HTTP", e.code, e.read().decode(), file=sys.stderr)
+              sys.exit(1)
           PYEOF
 
           SCOPED=$(TOKEN_INFO="$TOKEN_INFO" WORKSPACE="$WORKSPACE" \
