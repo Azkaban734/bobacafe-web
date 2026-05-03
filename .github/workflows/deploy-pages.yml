@@ -34,7 +34,23 @@ jobs:
           npm ci
           npm run build
 
+      - name: Mint Databricks OAuth Token
+        id: databricks_token
+        env:
+          CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+        run: |
+          RESPONSE=$(curl -sf -X POST \
+            https://dbc-d5bd17fc-eaf4.cloud.databricks.com/oidc/v1/token \
+            -u "${CLIENT_ID}:${CLIENT_SECRET}" \
+            -d "grant_type=client_credentials&scope=all-apis")
+          TOKEN=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
       - name: Prepare Deployment Artifact
+        env:
+          DATABRICKS_TOKEN: ${{ steps.databricks_token.outputs.token }}
         run: |
           # 1. Create output directories
           mkdir -p deploy/internal/schedule deploy/internal/reports
@@ -43,8 +59,10 @@ jobs:
           cp index.html deploy/index.html
 
           # 3. Internal dashboard + static pages
-          cp internal/index.html deploy/internal/index.html
-          cp internal/faq.html   deploy/internal/faq.html
+          cp internal/index.html       deploy/internal/index.html
+          cp internal/faq.html         deploy/internal/faq.html
+          cp internal/dashboard.html   deploy/internal/dashboard.html
+          sed -i "s|YOUR_DATABRICKS_TOKEN_HERE|${DATABRICKS_TOKEN}|g" deploy/internal/dashboard.html
 
           # 4. Fresh React build → internal/schedule
           cp -r schedule-app/build/* deploy/internal/schedule/
