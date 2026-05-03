@@ -40,22 +40,44 @@ jobs:
           CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
         run: |
-          # Step 1: get service principal OAuth token
-          OAUTH=$(curl -sf -X POST \
-            https://dbc-d5bd17fc-eaf4.cloud.databricks.com/oidc/v1/token \
-            -u "${CLIENT_ID}:${CLIENT_SECRET}" \
-            -d "grant_type=client_credentials&scope=all-apis")
-          OAUTH_TOKEN=$(echo "$OAUTH" | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+          WORKSPACE=https://dbc-d5bd17fc-eaf4.cloud.databricks.com
+          DASHBOARD_ID=01f14724493017eb83de2e8f2f33b5dc
 
-          # Step 2: exchange for a dashboard-scoped embedded token
-          EMBED=$(curl -sf -X POST \
-            "https://dbc-d5bd17fc-eaf4.cloud.databricks.com/api/2.0/lakeview/dashboards/01f14724493017eb83de2e8f2f33b5dc/published/credentials" \
-            -H "Authorization: Bearer ${OAUTH_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d '{}')
-          TOKEN=$(echo "$EMBED" | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
-          echo "::add-mask::$TOKEN"
-          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+          # Step 1: all-apis OAuth token
+          OAUTH_TOKEN=$(curl -sf -X POST "${WORKSPACE}/oidc/v1/token" \
+            -u "${CLIENT_ID}:${CLIENT_SECRET}" \
+            -d "grant_type=client_credentials&scope=all-apis" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+          # Step 2: fetch authorization_details scoped to this dashboard
+          TOKEN_INFO=$(curl -sf \
+            "${WORKSPACE}/api/2.0/lakeview/dashboards/${DASHBOARD_ID}/published/tokeninfo?external_viewer_id=internal&external_value=internal" \
+            -H "Authorization: Bearer ${OAUTH_TOKEN}")
+
+          # Step 3: exchange authorization_details for embedded token
+          cat > /tmp/mint_token.py << 'PYEOF'
+          import os, json, base64, urllib.parse, urllib.request
+          info       = json.loads(os.environ["TOKEN_INFO"])
+          params     = dict(info)
+          auth       = params.pop("authorization_details", None)
+          params["grant_type"]           = "client_credentials"
+          params["authorization_details"] = json.dumps(auth)
+          basic = base64.b64encode(
+              f"{os.environ['CLIENT_ID']}:{os.environ['CLIENT_SECRET']}".encode()
+          ).decode()
+          req = urllib.request.Request(
+              f"{os.environ['WORKSPACE']}/oidc/v1/token",
+              data=urllib.parse.urlencode(params).encode(),
+              headers={"Content-Type": "application/x-www-form-urlencoded",
+                       "Authorization": f"Basic {basic}"}
+          )
+          print(json.loads(urllib.request.urlopen(req).read())["access_token"])
+          PYEOF
+
+          SCOPED=$(TOKEN_INFO="$TOKEN_INFO" WORKSPACE="$WORKSPACE" \
+            python3 /tmp/mint_token.py)
+          echo "::add-mask::$SCOPED"
+          echo "token=$SCOPED" >> "$GITHUB_OUTPUT"
 
       - name: Prepare Deployment Artifact
         env:
