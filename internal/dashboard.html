@@ -327,13 +327,12 @@
         const stateEl     = document.getElementById('dashboard-state');
         const containerEl = document.getElementById('dashboard-container');
 
-        if (DATABRICKS_TOKEN === 'YOUR_DATABRICKS_TOKEN_HERE') {
+        if (!DATABRICKS_TOKEN || DATABRICKS_TOKEN.length < 20) {
             stateEl.innerHTML = `
                 <div class="state-icon">⚠️</div>
                 <div>Токен не настроен.</div>
                 <div style="font-size:13px;color:var(--text-3)">
-                    Замените <code>YOUR_DATABRICKS_TOKEN_HERE</code> в dashboard.html
-                    на действующий Databricks PAT.
+                    Databricks token is missing or invalid.
                 </div>`;
             return;
         }
