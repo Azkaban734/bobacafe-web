@@ -19,8 +19,10 @@ if (-not (Test-Path $SourceDir)) {
 
 New-Item -ItemType Directory -Force -Path $DestDir | Out-Null
 
-# Copy all HTML files
-$files = Get-ChildItem -Path $SourceDir -Filter "*.html" | Sort-Object Name -Descending
+# Copy all HTML files, excluding any pre-existing index.html in the source
+$files = Get-ChildItem -Path $SourceDir -Filter "*.html" |
+         Where-Object { $_.Name -ne "index.html" } |
+         Sort-Object Name -Descending
 if ($files.Count -eq 0) {
     Write-Host "No HTML files found in $SourceDir"
     exit 0
@@ -38,13 +40,17 @@ $rows = ($files | ForEach-Object {
     "      <li><a href=`"$($_.Name)`">$label</a></li>"
 }) -join "`n"
 
+# Use PowerShell unicode escapes to avoid PS 5.1 encoding issues with em-dash and emoji
+$mdash = [char]0x2014
+$chart = [char]::ConvertFromUtf32(0x1F4CA)
+
 $index = @"
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reports — Boba Cafe</title>
+  <title>Reports $mdash Boba Cafe</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
            background: #fdf6ec; color: #5d4037; margin: 0; padding: 40px; }
@@ -59,8 +65,8 @@ $index = @"
   </style>
 </head>
 <body>
-  <h1>📊 Boba Cafe Reports</h1>
-  <p>Internal analytics — updated automatically.</p>
+  <h1>$chart Boba Cafe Reports</h1>
+  <p>Internal analytics $mdash updated automatically.</p>
   <ul>
 $rows
   </ul>
