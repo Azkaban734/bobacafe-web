@@ -1,5 +1,5 @@
-# sync-reports.ps1
-# Copies generated HTML reports from boba-cafe-databricks into main-site/reports/
+﻿# sync-reports.ps1
+# Copies generated HTML reports from boba-cafe-databricks into internal/reports/
 # and regenerates the index. Run this after pulling boba-cafe-databricks.
 #
 # Usage:
@@ -10,7 +10,7 @@ param(
     [string]$SourceDir = "..\boba-cafe-databricks\weekly-analysis\analysis-html"
 )
 
-$DestDir = "$PSScriptRoot\main-site\reports"
+$DestDir = "$PSScriptRoot\internal\reports"
 
 if (-not (Test-Path $SourceDir)) {
     Write-Error "Source not found: $SourceDir"
@@ -19,10 +19,11 @@ if (-not (Test-Path $SourceDir)) {
 
 New-Item -ItemType Directory -Force -Path $DestDir | Out-Null
 
-# Copy all HTML files, excluding any pre-existing index.html in the source
+# Copy all HTML report files, excluding any pre-existing index.html in the source
 $files = Get-ChildItem -Path $SourceDir -Filter "*.html" |
          Where-Object { $_.Name -ne "index.html" } |
          Sort-Object Name -Descending
+
 if ($files.Count -eq 0) {
     Write-Host "No HTML files found in $SourceDir"
     exit 0
@@ -33,51 +34,256 @@ foreach ($f in $files) {
     Write-Host "Copied  $($f.Name)"
 }
 
-# Regenerate index.html
-$rows = ($files | ForEach-Object {
-    $label = $_.BaseName -replace "_", " " -replace "-", " "
-    $label = (Get-Culture).TextInfo.ToTitleCase($label.ToLower())
-    "      <li><a href=`"$($_.Name)`">$label</a></li>"
-}) -join "`n"
+# --- Build index entries ---
 
-# Use PowerShell unicode escapes to avoid PS 5.1 encoding issues with em-dash and emoji
-$mdash = [char]0x2014
-$chart = [char]::ConvertFromUtf32(0x1F4CA)
+$ruMonthsGen = @{
+    "01" = "января"; "02" = "февраля"; "03" = "марта";    "04" = "апреля"
+    "05" = "мая";    "06" = "июня";    "07" = "июля";     "08" = "августа"
+    "09" = "сентября"; "10" = "октября"; "11" = "ноября"; "12" = "декабря"
+}
+$ruMonthsNom = @{
+    "01" = "Январь"; "02" = "Февраль"; "03" = "Март";    "04" = "Апрель"
+    "05" = "Май";    "06" = "Июнь";    "07" = "Июль";   "08" = "Август"
+    "09" = "Сентябрь"; "10" = "Октябрь"; "11" = "Ноябрь"; "12" = "Декабрь"
+}
+
+$weekly  = @()
+$monthly = @()
+
+foreach ($f in $files) {
+    $n = $f.BaseName
+    if ($n -match '^(\d{4})-(\d{2})-(\d{2})_weekly') {
+        $weekly += [PSCustomObject]@{
+            File  = $f.Name
+            Label = "$([int]$Matches[3]) $($ruMonthsGen[$Matches[2]]) $($Matches[1])"
+        }
+    } elseif ($n -match '^(\d{4})-(\d{2})_(.+)') {
+        $monthly += [PSCustomObject]@{
+            File  = $f.Name
+            Title = (Get-Culture).TextInfo.ToTitleCase(($Matches[3] -replace "_", " "))
+            Label = "$($ruMonthsNom[$Matches[2]]) $($Matches[1])"
+        }
+    }
+}
+
+function New-ReportItem($file, $title, $label, $icon) {
+    return "        <a href=`"$file`" class=`"report-item`">`n" +
+           "            <div class=`"report-icon`">$icon</div>`n" +
+           "            <div class=`"report-info`">`n" +
+           "                <div class=`"report-name`">$title</div>`n" +
+           "                <div class=`"report-date`">$label</div>`n" +
+           "            </div>`n" +
+           "            <span class=`"report-arrow`">›</span>`n" +
+           "        </a>"
+}
+
+$weeklyRows  = ($weekly  | ForEach-Object { New-ReportItem $_.File "Еженедельный отчёт" $_.Label "📈" }) -join "`n"
+$monthlyRows = ($monthly | ForEach-Object { New-ReportItem $_.File $_.Title $_.Label "📊" }) -join "`n"
+
+$weeklySect = ""
+if ($weekly.Count -gt 0) {
+    $weeklySect = "`n    <div class=`"section-label`">Еженедельные</div>`n    <div class=`"report-list`">`n$weeklyRows`n    </div>"
+}
+
+$monthlySect = ""
+if ($monthly.Count -gt 0) {
+    $monthlySect = "`n    <div class=`"section-label`">Ежемесячные</div>`n    <div class=`"report-list`">`n$monthlyRows`n    </div>"
+}
 
 $index = @"
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reports $mdash Boba Cafe</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-           background: #fdf6ec; color: #5d4037; margin: 0; padding: 40px; }
-    h1   { font-size: 1.6em; margin-bottom: 0.25em; }
-    p    { color: #8d6e63; margin-top: 0; }
-    ul   { list-style: none; padding: 0; max-width: 600px; }
-    li   { margin: 10px 0; }
-    a    { color: #5d4037; text-decoration: none; border: 1px solid #d7ccc8;
-           padding: 10px 16px; border-radius: 6px; display: inline-block;
-           background: #fff; width: 100%; box-sizing: border-box; }
-    a:hover { background: #8d6e63; color: #fff; border-color: #8d6e63; }
-  </style>
+    <script>
+      if (sessionStorage.getItem('bc_pin_reports') !== '1') {
+        window.location.replace('/internal/');
+      }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчёты — Боба Кролик</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #f8f9fa;
+            --surface:   #ffffff;
+            --border:    #dadce0;
+            --text-1:    #202124;
+            --text-2:    #5f6368;
+            --text-3:    #80868b;
+            --accent:    #8d6e63;
+            --accent-bg: #f4ede9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text-1);
+            min-height: 100vh;
+            font-size: 16px;
+        }
+
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .nav-back:hover { text-decoration: underline; }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-1);
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-1);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .page-sub {
+            font-size: 16px;
+            color: var(--text-2);
+            margin-bottom: 40px;
+        }
+
+        .section-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 12px;
+        }
+
+        .report-list {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .report-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            text-decoration: none;
+            color: inherit;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+        }
+        .report-item:last-child { border-bottom: none; }
+        .report-item:hover { background: #f8f9fa; }
+
+        .report-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .report-info { flex: 1; }
+
+        .report-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-1);
+        }
+
+        .report-date {
+            font-size: 13px;
+            color: var(--text-3);
+            margin-top: 2px;
+        }
+
+        .report-arrow {
+            color: var(--text-3);
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+            color: var(--text-3);
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 640px) {
+            .page { padding: 32px 16px 60px; }
+            .page-title { font-size: 26px; }
+        }
+    </style>
 </head>
 <body>
-  <h1>$chart Boba Cafe Reports</h1>
-  <p>Internal analytics $mdash updated automatically.</p>
-  <ul>
-$rows
-  </ul>
+
+<nav>
+    <a href="/internal/" class="nav-back">
+        <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+            <path d="M7 1L1 7l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Портал
+    </a>
+    <span class="nav-title">Отчёты</span>
+    <div style="width:72px"></div>
+</nav>
+
+<div class="page">
+    <h1 class="page-title">Отчёты</h1>
+    <p class="page-sub">Внутренняя аналитика — обновляется автоматически</p>
+$weeklySect
+$monthlySect
+</div>
+
+<footer>
+    <a href="/internal/">← Внутренний портал</a>
+</footer>
+
 </body>
 </html>
 "@
 
-# Write UTF-8 without BOM — Out-File -Encoding utf8 adds a BOM which garbles
-# emojis and non-ASCII characters in browsers.
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText("$DestDir\index.html", $index, $utf8NoBom)
-Write-Host "Index   main-site/reports/index.html  ($($files.Count) report(s))"
+Write-Host "Index   internal/reports/index.html  ($($files.Count) report(s))"
 Write-Host ""
 Write-Host "Done. Commit and push bobacafe-web to publish."
