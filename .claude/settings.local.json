@@ -8,7 +8,13 @@
       "Bash(git rm *)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Github\\\\bobacafe-web\" -Force)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.databricks.com)",
+      "Bash(git commit -m 'fix: correct 3-step Databricks embedded token flow *)",
+      "Bash(git commit -m 'fix: set dashboard container to full viewport height *)"
     ]
   }
 }
