@@ -44,23 +44,23 @@ STRINGS = {
         "ozon orders":    "Ozon Orders",
         # Notes
         "note_sber": (
-            '<strong>POS Card Sales</strong>: "Зачисление средств по операциям эквайринга" — value = credit (net after fee).<br>'
-            '<strong>POS Commission</strong>: fee extracted from description ("Комиссия …").<br>'
-            '<strong>Yandex.Food</strong>: sender INN 9705114405 (ООО Яндекс.Еда) — value = credit.<br>'
-            '<strong>Salary</strong>: "Заработная плата по реестру" — value = debit.<br>'
-            '<strong>Purchase</strong>: card purchases (PURCHASE_CB) — value = debit.<br>'
-            '<strong>Return</strong>: purchase returns/cancellations — value = credit.<br>'
-            '<strong>Rent</strong>: description contains "аренд" — value = debit.<br>'
-            '<strong>Tax</strong>: "Единый налоговый платеж" or "ЕНП" — value = debit.<br>'
-            '<strong>Other Payments</strong>: description contains "Оплат" (rent takes priority if both match) — value = debit.'
+            '<strong>POS Card Sales</strong>: "Зачисление средств по операциям эквайринга" — positive (income, net after fee).<br>'
+            '<strong>POS Commission</strong>: fee extracted from description ("Комиссия …") — negative (cash out).<br>'
+            '<strong>Yandex.Food</strong>: sender INN 9705114405 (ООО Яндекс.Еда) — positive (income).<br>'
+            '<strong>Salary</strong>: "Заработная плата по реестру" — negative (cash out).<br>'
+            '<strong>Purchase</strong>: card purchases (PURCHASE_CB) — negative (cash out).<br>'
+            '<strong>Return</strong>: purchase returns/cancellations — positive (income).<br>'
+            '<strong>Rent</strong>: description contains "аренд" — negative (cash out).<br>'
+            '<strong>Tax</strong>: "Единый налоговый платеж" or "ЕНП" — negative (cash out).<br>'
+            '<strong>Other Payments</strong>: description contains "Оплат" (rent takes priority if both match) — negative (cash out).'
         ),
         "note_ozon": (
-            '<strong>Ozon Orders</strong>: "Оплата по заказу" — value = debit.<br>'
-            '<strong>Purchase</strong>: business card transactions ("бизнес карте") — value = debit.<br>'
-            '<strong>Return</strong>: "Возврат" — value = credit.<br>'
-            '<strong>Rent</strong>: description contains "аренд" — value = debit.<br>'
-            '<strong>Bank Fee</strong>: "Комиссия за исполнение" — value = debit.<br>'
-            '<strong>Other Payments</strong>: description contains "Оплат" (rent takes priority) — value = debit.'
+            '<strong>Ozon Orders</strong>: "Оплата по заказу" — negative (cash out).<br>'
+            '<strong>Purchase</strong>: business card transactions ("бизнес карте") — negative (cash out).<br>'
+            '<strong>Return</strong>: "Возврат" — positive (income).<br>'
+            '<strong>Rent</strong>: description contains "аренд" — negative (cash out).<br>'
+            '<strong>Bank Fee</strong>: "Комиссия за исполнение" — negative (cash out).<br>'
+            '<strong>Other Payments</strong>: description contains "Оплат" (rent takes priority) — negative (cash out).'
         ),
     },
     "ru": {
@@ -100,23 +100,23 @@ STRINGS = {
         "ozon orders":    "Заказы Ozon",
         # Notes
         "note_sber": (
-            '<strong>Продажи через терминал</strong>: «Зачисление средств по операциям эквайринга» — значение = кредит (за вычетом комиссии).<br>'
-            '<strong>Комиссия за терминал</strong>: комиссия извлекается из описания («Комиссия …»).<br>'
-            '<strong>Яндекс.Еда</strong>: отправитель ИНН 9705114405 (ООО Яндекс.Еда) — значение = кредит.<br>'
-            '<strong>Зарплата</strong>: «Заработная плата по реестру» — значение = дебет.<br>'
-            '<strong>Покупки</strong>: покупки по карте (PURCHASE_CB) — значение = дебет.<br>'
-            '<strong>Возвраты</strong>: возврат/отмена покупок — значение = кредит.<br>'
-            '<strong>Аренда</strong>: описание содержит «аренд» — значение = дебет.<br>'
-            '<strong>Налоги</strong>: «Единый налоговый платеж» или «ЕНП» — значение = дебет.<br>'
-            '<strong>Прочие платежи</strong>: описание содержит «Оплат» (аренда имеет приоритет) — значение = дебет.'
+            '<strong>Продажи через терминал</strong>: «Зачисление средств по операциям эквайринга» — положительное (доход, за вычетом комиссии).<br>'
+            '<strong>Комиссия за терминал</strong>: комиссия извлекается из описания («Комиссия …») — отрицательное (расход).<br>'
+            '<strong>Яндекс.Еда</strong>: отправитель ИНН 9705114405 (ООО Яндекс.Еда) — положительное (доход).<br>'
+            '<strong>Зарплата</strong>: «Заработная плата по реестру» — отрицательное (расход).<br>'
+            '<strong>Покупки</strong>: покупки по карте (PURCHASE_CB) — отрицательное (расход).<br>'
+            '<strong>Возвраты</strong>: возврат/отмена покупок — положительное (доход).<br>'
+            '<strong>Аренда</strong>: описание содержит «аренд» — отрицательное (расход).<br>'
+            '<strong>Налоги</strong>: «Единый налоговый платеж» или «ЕНП» — отрицательное (расход).<br>'
+            '<strong>Прочие платежи</strong>: описание содержит «Оплат» (аренда имеет приоритет) — отрицательное (расход).'
         ),
         "note_ozon": (
-            '<strong>Заказы Ozon</strong>: «Оплата по заказу» — значение = дебет.<br>'
-            '<strong>Покупки</strong>: операции по бизнес-карте («бизнес карте») — значение = дебет.<br>'
-            '<strong>Возвраты</strong>: «Возврат» — значение = кредит.<br>'
-            '<strong>Аренда</strong>: описание содержит «аренд» — значение = дебет.<br>'
-            '<strong>Комиссия банка</strong>: «Комиссия за исполнение» — значение = дебет.<br>'
-            '<strong>Прочие платежи</strong>: описание содержит «Оплат» (аренда имеет приоритет) — значение = дебет.'
+            '<strong>Заказы Ozon</strong>: «Оплата по заказу» — отрицательное (расход).<br>'
+            '<strong>Покупки</strong>: операции по бизнес-карте («бизнес карте») — отрицательное (расход).<br>'
+            '<strong>Возвраты</strong>: «Возврат» — положительное (доход).<br>'
+            '<strong>Аренда</strong>: описание содержит «аренд» — отрицательное (расход).<br>'
+            '<strong>Комиссия банка</strong>: «Комиссия за исполнение» — отрицательное (расход).<br>'
+            '<strong>Прочие платежи</strong>: описание содержит «Оплат» (аренда имеет приоритет) — отрицательное (расход).'
         ),
     },
 }
@@ -226,7 +226,7 @@ def _detail_rows_html(df, type_key, months, row_id, val_class):
 
     type_df["receiver"] = type_df["receiver"].astype(str).str.strip()
     recv_month = type_df.groupby(["receiver", "month"])["value"].sum()
-    recv_totals = type_df.groupby("receiver")["value"].sum().sort_values(ascending=False)
+    recv_totals = type_df.groupby("receiver")["value"].sum().sort_values(key=lambda x: x.abs(), ascending=False)
 
     html = ""
     for receiver, _ in recv_totals.items():
@@ -278,7 +278,7 @@ def process_sber(file_buf, lang) -> str:
     is_other    = desc.str.contains("Оплат", case=False, na=False)
     is_bankfee  = desc.str.contains("Комиссия в другие банки", case=False, na=False)
 
-    df["commission"] = pd.to_numeric(
+    df["commission"] = -pd.to_numeric(
         desc.str.extract(r"Комиссия\s+([\d.]+?)\.")[0], errors="coerce"
     )
     df.loc[~is_pos, "commission"] = None
@@ -295,15 +295,15 @@ def process_sber(file_buf, lang) -> str:
     df.loc[is_bankfee,  "type"] = "bank fee"
 
     df["value"] = None
-    df.loc[is_pos,      "value"] = df.loc[is_pos,      "credit"]
-    df.loc[is_yandex,   "value"] = df.loc[is_yandex,   "credit"]
-    df.loc[is_salary,   "value"] = df.loc[is_salary,   "debit"]
-    df.loc[is_purchase, "value"] = df.loc[is_purchase, "debit"]
-    df.loc[is_return,   "value"] = df.loc[is_return,   "credit"]
-    df.loc[is_rent,     "value"] = df.loc[is_rent,     "debit"]
-    df.loc[is_tax,      "value"] = df.loc[is_tax,      "debit"]
-    df.loc[df["type"] == "other payments", "value"] = df.loc[df["type"] == "other payments", "debit"]
-    df.loc[is_bankfee,  "value"] = df.loc[is_bankfee,  "debit"]
+    df.loc[is_pos,      "value"] =  df.loc[is_pos,      "credit"]
+    df.loc[is_yandex,   "value"] =  df.loc[is_yandex,   "credit"]
+    df.loc[is_salary,   "value"] = -df.loc[is_salary,   "debit"]
+    df.loc[is_purchase, "value"] = -df.loc[is_purchase, "debit"]
+    df.loc[is_return,   "value"] =  df.loc[is_return,   "credit"]
+    df.loc[is_rent,     "value"] = -df.loc[is_rent,     "debit"]
+    df.loc[is_tax,      "value"] = -df.loc[is_tax,      "debit"]
+    df.loc[df["type"] == "other payments", "value"] = -df.loc[df["type"] == "other payments", "debit"]
+    df.loc[is_bankfee,  "value"] = -df.loc[is_bankfee,  "debit"]
 
     df["receiver"] = (
         df["credit_acct"].astype(str)
@@ -406,12 +406,12 @@ def process_ozon(file_buf, lang) -> str:
     df.loc[is_other & df["type"].isna(), "type"] = "other payments"
 
     df["value"] = None
-    df.loc[df["type"] == "ozon orders",    "value"] = df.loc[df["type"] == "ozon orders",    "debit"]
-    df.loc[df["type"] == "purchase",       "value"] = df.loc[df["type"] == "purchase",       "debit"]
-    df.loc[df["type"] == "return",         "value"] = df.loc[df["type"] == "return",         "credit"]
-    df.loc[df["type"] == "rent",           "value"] = df.loc[df["type"] == "rent",           "debit"]
-    df.loc[df["type"] == "bank fee",       "value"] = df.loc[df["type"] == "bank fee",       "debit"]
-    df.loc[df["type"] == "other payments", "value"] = df.loc[df["type"] == "other payments", "debit"]
+    df.loc[df["type"] == "ozon orders",    "value"] = -df.loc[df["type"] == "ozon orders",    "debit"]
+    df.loc[df["type"] == "purchase",       "value"] = -df.loc[df["type"] == "purchase",       "debit"]
+    df.loc[df["type"] == "return",         "value"] =  df.loc[df["type"] == "return",         "credit"]
+    df.loc[df["type"] == "rent",           "value"] = -df.loc[df["type"] == "rent",           "debit"]
+    df.loc[df["type"] == "bank fee",       "value"] = -df.loc[df["type"] == "bank fee",       "debit"]
+    df.loc[df["type"] == "other payments", "value"] = -df.loc[df["type"] == "other payments", "debit"]
 
     df["receiver"] = df["counterparty"].astype(str).str.strip()
 
