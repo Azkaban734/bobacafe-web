@@ -29,7 +29,7 @@ STRINGS = {
         "money_out":   "Money out",
         "col_type":    "Type",
         "col_total":   "Total",
-        "footer_total": "Total Received",
+        "footer_total": "Net Total",
         # Transaction type labels
         "pos card":       "POS Card Sales",
         "pos commission": "POS Commission",
@@ -85,7 +85,7 @@ STRINGS = {
         "money_out":   "Расход",
         "col_type":    "Тип",
         "col_total":   "Итого",
-        "footer_total": "Итого получено",
+        "footer_total": "Итого нетто",
         # Transaction type labels
         "pos card":       "Продажи через терминал",
         "pos commission": "Комиссия за терминал",
@@ -209,7 +209,9 @@ run = st.button(
 # ── Processing functions ──────────────────────────────────────────────────────
 
 def fmt(v):
-    return f"{v:,.2f}" if v else "—"
+    if not v:
+        return "—"
+    return f"+{v:,.2f}" if v > 0 else f"{v:,.2f}"
 
 
 def _detail_rows_html(df, type_key, months, row_id, val_class):
@@ -331,7 +333,8 @@ def process_sber(file_buf, lang) -> str:
 
     summary = df[df["type"].notna()].groupby(["month", "type"])["value"].sum().unstack(fill_value=0)
     commission_summary = df[is_pos].groupby("month")["commission"].sum()
-    totals = {str(m): df[df["month"] == m]["credit"].sum() for m in months}
+    typed_net = df[df["type"].notna()].groupby("month")["value"].sum()
+    totals = {str(m): typed_net.get(m, 0) + commission_summary.get(m, 0) for m in months}
 
     rows_html = ""
     for i, (type_key, label, bg, color, dot, flow) in enumerate(types_config):
@@ -429,7 +432,8 @@ def process_ozon(file_buf, lang) -> str:
     ]
 
     summary = df[df["type"].notna()].groupby(["month", "type"])["value"].sum().unstack(fill_value=0)
-    totals  = {str(m): df[df["month"] == m]["credit"].sum() for m in months}
+    typed_net = df[df["type"].notna()].groupby("month")["value"].sum()
+    totals = {str(m): typed_net.get(m, 0) for m in months}
 
     rows_html = ""
     for i, (type_key, label, bg, color, dot, flow) in enumerate(types_config):
