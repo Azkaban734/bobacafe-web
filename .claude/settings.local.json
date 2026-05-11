@@ -14,7 +14,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.databricks.com)",
       "Bash(git commit -m 'fix: correct 3-step Databricks embedded token flow *)",
-      "Bash(git commit -m 'fix: set dashboard container to full viewport height *)"
+      "Bash(git commit -m 'fix: set dashboard container to full viewport height *)",
+      "Bash(streamlit run *)",
+      "PowerShell(Get-Content \"C:\\\\Users\\\\david\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Github-bobacafe-web\\\\e2898f14-f75d-4b02-8f5c-e53fcdebb2ad\\\\tasks\\\\b51polpnz.output\" -Wait -Tail 20)"
     ]
   }
 }
